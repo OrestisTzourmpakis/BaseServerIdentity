@@ -34,8 +34,8 @@ namespace Server.Api.Extensions
                     if (retryForAvailability < 50)
                     {
                         retryForAvailability++;
-                        System.Threading.Thread.Sleep(2000);
-                        MigrateDatabase<T>(host, retryForAvailability);
+                        await Task.Delay(2000);
+                        await MigrateDatabase<T>(host, retryForAvailability);
                     }
                 }
             }
