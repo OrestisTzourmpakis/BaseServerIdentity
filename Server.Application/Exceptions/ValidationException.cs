@@ -10,11 +10,11 @@ namespace Server.Application.Exceptions
     public class ValidationException : ApplicationException
     {
         public List<string> Errors { get; set; } = new List<string>();
-        public ValidationException(ValidationResult validationResult)
+        public ValidationException(IEnumerable<ValidationFailure> validationResults)
         {
-            foreach (var error in validationResult.Errors)
+            foreach (var validationResult in validationResults)
             {
-                Errors.Add(error.ErrorMessage);
+                Errors.Add(validationResult.ErrorMessage);
             }
         }
         public ValidationException(IEnumerable<IdentityError> errors)

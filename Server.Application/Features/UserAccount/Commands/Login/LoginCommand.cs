@@ -9,11 +9,13 @@ using Server.Application.DTO.Login;
 using Server.Application.DTO.Register;
 using Server.Application.Responses;
 
-namespace Server.Application.Features.UserAccount.Commands
+namespace Server.Application.Features.UserAccount.Commands.Login
 {
     public class LoginCommand : IRequest<BaseResponse>
     {
-        public LoginDto LoginModel { get; set; }
+        public string Email { get; set; }
+        public string Password { get; set; }
+
     }
     public class LoginCommandHandler : IRequestHandler<LoginCommand, BaseResponse>
     {
@@ -26,7 +28,7 @@ namespace Server.Application.Features.UserAccount.Commands
 
         public async Task<BaseResponse> Handle(LoginCommand request, CancellationToken cancellationToken)
         {
-            var result = await _userAccount.LoginUser(request.LoginModel);
+            var result = await _userAccount.LoginUser(request);
             var response = new BaseResponse { data = "User logged in successfully!" };
             return response;
         }

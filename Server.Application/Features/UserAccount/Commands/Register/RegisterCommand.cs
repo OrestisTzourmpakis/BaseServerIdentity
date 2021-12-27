@@ -10,11 +10,13 @@ using Server.Application.Contracts;
 using Server.Application.DTO.Register;
 using Server.Application.Responses;
 
-namespace Server.Application.Features.UserAccount.Commands
+namespace Server.Application.Features.UserAccount.Commands.Register
 {
     public class RegisterCommand : IRequest<BaseResponse>
     {
-        public RegisterDto RegisterModel { get; set; }
+        public string Email { get; set; }
+        public string UserName { get; set; }
+        public string Password { get; set; }
     }
     public class RegisterCommandHandler : IRequestHandler<RegisterCommand, BaseResponse>
     {
@@ -29,7 +31,7 @@ namespace Server.Application.Features.UserAccount.Commands
 
         public async Task<BaseResponse> Handle(RegisterCommand request, CancellationToken cancellationToken)
         {
-            var result = await _userAccount.RegisterUser(request.RegisterModel);
+            var result = await _userAccount.RegisterUser(request);
             return new BaseResponse { data = "User registered successfully!" };
         }
     }

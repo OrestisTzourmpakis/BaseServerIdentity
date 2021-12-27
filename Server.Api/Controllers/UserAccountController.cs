@@ -10,6 +10,8 @@ using Server.Application.Contracts;
 using Server.Application.DTO.Login;
 using Server.Application.DTO.Register;
 using Server.Application.Features.UserAccount.Commands;
+using Server.Application.Features.UserAccount.Commands.Login;
+using Server.Application.Features.UserAccount.Commands.Register;
 using Server.Application.Models.Identity;
 using Server.Infrastructure.Persistence;
 
@@ -40,16 +42,15 @@ namespace Server.Api.Controllers
         }
         [HttpPost]
         [Route("register")]
-        public async Task<IActionResult> Register([FromBody] RegisterDto user)
+        public async Task<IActionResult> Register([FromBody] RegisterCommand user)
         {
-            var command = new RegisterCommand { RegisterModel = user };
-            var response = await _mediator.Send(command);
+            var response = await _mediator.Send(user);
             return Ok();
         }
 
         [HttpPost]
         [Route("login")]
-        public async Task<IActionResult> Login([FromBody] LoginDto user)
+        public async Task<IActionResult> Login([FromBody] LoginCommand user)
         {
             // var command = new LoginCommand { LoginModel = user };
             // var response = await _mediator.Send(command);
