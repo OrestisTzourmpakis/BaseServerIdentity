@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Server.Infrastructure.Persistence;
 
@@ -11,9 +12,10 @@ using Server.Infrastructure.Persistence;
 namespace Server.Infrastructure.Migrations
 {
     [DbContext(typeof(ServerDbContext))]
-    partial class ServerDbContextModelSnapshot : ModelSnapshot
+    [Migration("20220109122708_Initial")]
+    partial class Initial
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -224,6 +226,21 @@ namespace Server.Infrastructure.Migrations
                     b.ToTable("AspNetUsers", (string)null);
                 });
 
+            modelBuilder.Entity("Server.Domain.Models.ApplicationUserCompany", b =>
+                {
+                    b.Property<string>("ApplicationUserId")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<int>("CompanyId")
+                        .HasColumnType("int");
+
+                    b.HasKey("ApplicationUserId", "CompanyId");
+
+                    b.HasIndex("CompanyId");
+
+                    b.ToTable("ApplicationUserCompanies");
+                });
+
             modelBuilder.Entity("Server.Domain.Models.Company", b =>
                 {
                     b.Property<int>("Id")
@@ -234,11 +251,6 @@ namespace Server.Infrastructure.Migrations
 
                     b.Property<string>("ApplicationUserId")
                         .HasColumnType("nvarchar(450)");
-
-                    b.Property<double>("EuroToPointsRatio")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("float")
-                        .HasDefaultValue(0.20000000000000001);
 
                     b.Property<string>("Facebook")
                         .HasColumnType("nvarchar(max)");
@@ -251,11 +263,6 @@ namespace Server.Infrastructure.Migrations
 
                     b.Property<string>("Name")
                         .HasColumnType("nvarchar(max)");
-
-                    b.Property<double>("PointsToEuroRatio")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("float")
-                        .HasDefaultValue(0.001);
 
                     b.Property<string>("Twitter")
                         .HasColumnType("nvarchar(max)");
@@ -280,8 +287,8 @@ namespace Server.Infrastructure.Migrations
                     b.Property<int>("CompanyId")
                         .HasColumnType("int");
 
-                    b.Property<double>("Total")
-                        .HasColumnType("float");
+                    b.Property<int>("Total")
+                        .HasColumnType("int");
 
                     b.HasKey("ApplicationUserId", "CompanyId");
 
@@ -317,57 +324,21 @@ namespace Server.Infrastructure.Migrations
                     b.ToTable("PointsHistory");
                 });
 
-            modelBuilder.Entity("Server.Domain.Models.Sales", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
-
-                    b.Property<int>("CompanyId")
-                        .HasColumnType("int");
-
-                    b.Property<DateTime>("DateEnd")
-                        .HasColumnType("datetime2");
-
-                    b.Property<DateTime>("DateStart")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("Description")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Image")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Title")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("CompanyId");
-
-                    b.ToTable("Sales");
-                });
-
             modelBuilder.Entity("Server.Domain.Models.Store", b =>
                 {
+                    b.Property<int>("CompanyId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Address")
+                        .HasColumnType("nvarchar(450)");
+
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
 
-                    b.Property<string>("Address")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<int>("CompanyId")
-                        .HasColumnType("int");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("CompanyId");
+                    b.HasKey("CompanyId", "Address");
 
                     b.ToTable("Stores");
                 });
@@ -423,6 +394,25 @@ namespace Server.Infrastructure.Migrations
                         .IsRequired();
                 });
 
+            modelBuilder.Entity("Server.Domain.Models.ApplicationUserCompany", b =>
+                {
+                    b.HasOne("Server.Domain.Models.ApplicationUser", "ApplicationUser")
+                        .WithMany("ApplicationUserCompanies")
+                        .HasForeignKey("ApplicationUserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Server.Domain.Models.Company", "Company")
+                        .WithMany("ApplicationUserCompanies")
+                        .HasForeignKey("CompanyId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("ApplicationUser");
+
+                    b.Navigation("Company");
+                });
+
             modelBuilder.Entity("Server.Domain.Models.Company", b =>
                 {
                     b.HasOne("Server.Domain.Models.ApplicationUser", "Owner")
@@ -470,17 +460,6 @@ namespace Server.Infrastructure.Migrations
                     b.Navigation("Company");
                 });
 
-            modelBuilder.Entity("Server.Domain.Models.Sales", b =>
-                {
-                    b.HasOne("Server.Domain.Models.Company", "Company")
-                        .WithMany()
-                        .HasForeignKey("CompanyId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Company");
-                });
-
             modelBuilder.Entity("Server.Domain.Models.Store", b =>
                 {
                     b.HasOne("Server.Domain.Models.Company", "Company")
@@ -494,6 +473,8 @@ namespace Server.Infrastructure.Migrations
 
             modelBuilder.Entity("Server.Domain.Models.ApplicationUser", b =>
                 {
+                    b.Navigation("ApplicationUserCompanies");
+
                     b.Navigation("Company");
 
                     b.Navigation("Points");
@@ -501,6 +482,8 @@ namespace Server.Infrastructure.Migrations
 
             modelBuilder.Entity("Server.Domain.Models.Company", b =>
                 {
+                    b.Navigation("ApplicationUserCompanies");
+
                     b.Navigation("Stores");
                 });
 #pragma warning restore 612, 618

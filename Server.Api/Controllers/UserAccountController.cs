@@ -12,6 +12,7 @@ using Server.Application.DTO.Register;
 using Server.Application.Features.UserAccount.Commands;
 using Server.Application.Features.UserAccount.Commands.Login;
 using Server.Application.Features.UserAccount.Commands.Register;
+using Server.Application.Features.UserAccount.Queries;
 using Server.Application.Models.Identity;
 using Server.Infrastructure.Persistence;
 
@@ -53,7 +54,7 @@ namespace Server.Api.Controllers
         public async Task<IActionResult> Login([FromBody] LoginCommand user)
         {
             // var command = new LoginCommand { LoginModel = user };
-            // var response = await _mediator.Send(command);
+            // var response = await _mediator.Send(user);
             return Ok(await _authService.Login(_mapper.Map<AuthRequest>(user)));
         }
 
@@ -65,6 +66,35 @@ namespace Server.Api.Controllers
         public IActionResult Login()
         {
             return Ok("bhke boy");
+        }
+
+        [Authorize(Roles = $"{nameof(Roles.Administrator)},{nameof(Roles.CompanyOwner)}")]
+        [HttpGet]
+        [Route("updateUser")]
+        public IActionResult AddUser()
+        {
+            return Ok("bhke boy");
+        }
+        [Authorize(Roles = $"{nameof(Roles.Administrator)}")]
+        [HttpGet]
+        [Route("deleteUser")]
+        public IActionResult DeleteUser()
+        {
+            return Ok("bhke boy");
+        }
+
+        [HttpGet]
+        [Route("getUsersByCompany")]
+        public async Task<IActionResult> GetUsersByCompany(int id)
+        {
+            return Ok(await _mediator.Send(new GetAllUsersByCompanyQuery() { CompanyId = id }));
+        }
+
+        [HttpGet]
+        [Route("getAllUsers")]
+        public async Task<IActionResult> GetAllUsers()
+        {
+            return Ok(await _mediator.Send(new GetAllUsersQuery()));
         }
     }
 }

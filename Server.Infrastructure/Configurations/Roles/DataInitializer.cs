@@ -43,13 +43,13 @@ namespace Server.Infrastructure.Configurations.Roles
                     UserName = "admin",
                     Email = "otzurbakis13@gmail.com"
                 };
-                var storeOwnerUser = new ApplicationUser
+                var companyOwnerUser = new ApplicationUser
                 {
-                    UserName = "storeOwner",
+                    UserName = "companyOwnerTest1",
                     Email = "o.tzourmpakis@gmail.com"
                 };
                 await SeedUsersHelper(userManager, adminUser, "Orestis123!", nameof(persistence.Roles.Administrator));
-                await SeedUsersHelper(userManager, storeOwnerUser, "Orestis123!", nameof(persistence.Roles.StoreOwner));
+                await SeedUsersHelper(userManager, companyOwnerUser, "Orestis123!", nameof(persistence.Roles.CompanyOwner));
                 // var checkAdmin = await userManager.FindByEmailAsync(adminUser.Email);
                 // var checkStoreOwner = await userManager.FindByEmailAsync(storeOwnerUser.Email);
                 // if (checkAdmin == null)

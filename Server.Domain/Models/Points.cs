@@ -7,13 +7,10 @@ namespace Server.Domain.Models
 {
     public class Points
     {
-        public int Id { get; set; }
-        public string CustomUserId { get; set; }
-        public ApplicationUser CustomUser { get; set; }
-
-        public int StoreId { get; set; }
-        public Store Store { get; set; }
-
         public double Total { get; set; }
+        public string ApplicationUserId { get; set; }
+        public int CompanyId { get; set; }
+        public ApplicationUser ApplicationUser { get; set; }
+        public Company Company { get; set; }
     }
 }

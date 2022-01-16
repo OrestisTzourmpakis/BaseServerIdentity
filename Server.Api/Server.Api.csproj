@@ -11,6 +11,7 @@
     <PackageReference Include="Serilog.Sinks.Console" Version="4.0.1"/>
     <PackageReference Include="Serilog.Sinks.File" Version="5.0.0"/>
     <PackageReference Include="Swashbuckle.AspNetCore" Version="6.2.3"/>
+    <PackageReference Include="Microsoft.AspNetCore.Mvc.NewtonsoftJson" Version="6.0.1"/>
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="../Server.Application/Server.Application.csproj"/>

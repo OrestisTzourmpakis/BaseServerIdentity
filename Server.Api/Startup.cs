@@ -44,7 +44,8 @@ namespace Server.Api
             #endregion
             services.Configure<KestrelServerOptions>(Configuration.GetSection("Kestrel"));
 
-            services.AddControllersWithViews();
+            services.AddControllersWithViews().AddNewtonsoftJson(op =>
+            op.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore); ;
             services.ConfigureApplicationServices();
             services.ConfigureInfrastructureServices(Configuration);
 

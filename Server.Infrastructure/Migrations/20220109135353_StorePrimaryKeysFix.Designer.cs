@@ -12,8 +12,8 @@ using Server.Infrastructure.Persistence;
 namespace Server.Infrastructure.Migrations
 {
     [DbContext(typeof(ServerDbContext))]
-    [Migration("20211222115241_IdentityTables")]
-    partial class IdentityTables
+    [Migration("20220109135353_StorePrimaryKeysFix")]
+    partial class StorePrimaryKeysFix
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -226,7 +226,22 @@ namespace Server.Infrastructure.Migrations
                     b.ToTable("AspNetUsers", (string)null);
                 });
 
-            modelBuilder.Entity("Server.Domain.Models.Points", b =>
+            modelBuilder.Entity("Server.Domain.Models.ApplicationUserCompany", b =>
+                {
+                    b.Property<string>("ApplicationUserId")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<int>("CompanyId")
+                        .HasColumnType("int");
+
+                    b.HasKey("ApplicationUserId", "CompanyId");
+
+                    b.HasIndex("CompanyId");
+
+                    b.ToTable("ApplicationUserCompanies");
+                });
+
+            modelBuilder.Entity("Server.Domain.Models.Company", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -234,22 +249,79 @@ namespace Server.Infrastructure.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
 
-                    b.Property<string>("CustomUserId")
+                    b.Property<string>("ApplicationUserId")
                         .HasColumnType("nvarchar(450)");
 
-                    b.Property<int>("StoreId")
+                    b.Property<string>("Facebook")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Instagram")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Logo")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Name")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Twitter")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Website")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ApplicationUserId")
+                        .IsUnique()
+                        .HasFilter("[ApplicationUserId] IS NOT NULL");
+
+                    b.ToTable("Companies");
+                });
+
+            modelBuilder.Entity("Server.Domain.Models.Points", b =>
+                {
+                    b.Property<string>("ApplicationUserId")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<int>("CompanyId")
                         .HasColumnType("int");
 
-                    b.Property<double>("Total")
+                    b.Property<int>("Total")
+                        .HasColumnType("int");
+
+                    b.HasKey("ApplicationUserId", "CompanyId");
+
+                    b.HasIndex("CompanyId");
+
+                    b.ToTable("Points");
+                });
+
+            modelBuilder.Entity("Server.Domain.Models.PointsHistory", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
+
+                    b.Property<string>("ApplicationUserId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<int>("CompanyId")
+                        .HasColumnType("int");
+
+                    b.Property<double>("Transaction")
                         .HasColumnType("float");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("CustomUserId");
+                    b.HasIndex("ApplicationUserId");
 
-                    b.HasIndex("StoreId");
+                    b.HasIndex("CompanyId");
 
-                    b.ToTable("Points");
+                    b.ToTable("PointsHistory");
                 });
 
             modelBuilder.Entity("Server.Domain.Models.Store", b =>
@@ -260,7 +332,16 @@ namespace Server.Infrastructure.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
 
+                    b.Property<string>("Address")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("CompanyId")
+                        .HasColumnType("int");
+
                     b.HasKey("Id");
+
+                    b.HasIndex("CompanyId");
 
                     b.ToTable("Stores");
                 });
@@ -316,26 +397,97 @@ namespace Server.Infrastructure.Migrations
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("Server.Domain.Models.Points", b =>
+            modelBuilder.Entity("Server.Domain.Models.ApplicationUserCompany", b =>
                 {
-                    b.HasOne("Server.Domain.Models.ApplicationUser", "CustomUser")
-                        .WithMany("Points")
-                        .HasForeignKey("CustomUserId");
-
-                    b.HasOne("Server.Domain.Models.Store", "Store")
-                        .WithMany()
-                        .HasForeignKey("StoreId")
+                    b.HasOne("Server.Domain.Models.ApplicationUser", "ApplicationUser")
+                        .WithMany("ApplicationUserCompanies")
+                        .HasForeignKey("ApplicationUserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("CustomUser");
+                    b.HasOne("Server.Domain.Models.Company", "Company")
+                        .WithMany("ApplicationUserCompanies")
+                        .HasForeignKey("CompanyId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
-                    b.Navigation("Store");
+                    b.Navigation("ApplicationUser");
+
+                    b.Navigation("Company");
+                });
+
+            modelBuilder.Entity("Server.Domain.Models.Company", b =>
+                {
+                    b.HasOne("Server.Domain.Models.ApplicationUser", "Owner")
+                        .WithOne("Company")
+                        .HasForeignKey("Server.Domain.Models.Company", "ApplicationUserId");
+
+                    b.Navigation("Owner");
+                });
+
+            modelBuilder.Entity("Server.Domain.Models.Points", b =>
+                {
+                    b.HasOne("Server.Domain.Models.ApplicationUser", "ApplicationUser")
+                        .WithMany("Points")
+                        .HasForeignKey("ApplicationUserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Server.Domain.Models.Company", "Company")
+                        .WithMany()
+                        .HasForeignKey("CompanyId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("ApplicationUser");
+
+                    b.Navigation("Company");
+                });
+
+            modelBuilder.Entity("Server.Domain.Models.PointsHistory", b =>
+                {
+                    b.HasOne("Server.Domain.Models.ApplicationUser", "ApplicationUser")
+                        .WithMany()
+                        .HasForeignKey("ApplicationUserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Server.Domain.Models.Company", "Company")
+                        .WithMany()
+                        .HasForeignKey("CompanyId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("ApplicationUser");
+
+                    b.Navigation("Company");
+                });
+
+            modelBuilder.Entity("Server.Domain.Models.Store", b =>
+                {
+                    b.HasOne("Server.Domain.Models.Company", "Company")
+                        .WithMany("Stores")
+                        .HasForeignKey("CompanyId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Company");
                 });
 
             modelBuilder.Entity("Server.Domain.Models.ApplicationUser", b =>
                 {
+                    b.Navigation("ApplicationUserCompanies");
+
+                    b.Navigation("Company");
+
                     b.Navigation("Points");
+                });
+
+            modelBuilder.Entity("Server.Domain.Models.Company", b =>
+                {
+                    b.Navigation("ApplicationUserCompanies");
+
+                    b.Navigation("Stores");
                 });
 #pragma warning restore 612, 618
         }

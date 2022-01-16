@@ -32,17 +32,20 @@ namespace Server.Infrastructure.Authentication
             var user = await _userManager.FindByEmailAsync(request.Email);
             if (user == null)
                 throw new Exception($"User with {request.Email} not found.");
+            var roles = await _userManager.GetRolesAsync(user);
             var result = await _signInManager.PasswordSignInAsync(user.UserName, request.Password, false, lockoutOnFailure: false);
             if (!result.Succeeded)
                 throw new Exception($"Credentials for '{request.Email} aren't valid'.");
 
-            JwtSecurityToken jwtSecurityToken = await GenerateToken(user);
+            JwtSecurityToken jwtSecurityToken = await GenerateToken(user, roles);
             AuthResponse response = new AuthResponse
             {
                 Id = user.Id,
                 Token = new JwtSecurityTokenHandler().WriteToken(jwtSecurityToken),
                 Email = user.Email,
-                UserName = user.UserName
+                UserName = user.UserName,
+                Roles = roles
+
             };
             return response;
 
@@ -54,11 +57,9 @@ namespace Server.Infrastructure.Authentication
             throw new NotImplementedException();
         }
 
-        private async Task<JwtSecurityToken> GenerateToken(ApplicationUser user)
+        private async Task<JwtSecurityToken> GenerateToken(ApplicationUser user, IList<string> roles)
         {
             var userClaims = await _userManager.GetClaimsAsync(user);
-            var roles = await _userManager.GetRolesAsync(user);
-
             var rolesClaims = new List<Claim>();
             for (int i = 0; i < roles.Count; i++)
                 rolesClaims.Add(new Claim(ClaimTypes.Role, roles[i]));

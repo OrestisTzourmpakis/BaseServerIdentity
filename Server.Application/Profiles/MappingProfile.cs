@@ -6,6 +6,9 @@ using AutoMapper;
 using Microsoft.AspNetCore.Identity;
 using Server.Application.DTO.Login;
 using Server.Application.DTO.Register;
+using Server.Application.Features.Companies.Commands;
+using Server.Application.Features.Sales.Commands;
+using Server.Application.Features.Stores.Commands;
 using Server.Application.Features.UserAccount.Commands.Login;
 using Server.Application.Features.UserAccount.Commands.Register;
 using Server.Application.Models.Identity;
@@ -23,8 +26,23 @@ namespace Server.Application.Profiles
             CreateMap<ApplicationUser, RegisterDto>().ReverseMap();
             CreateMap<LoginDto, AuthRequest>().ReverseMap();
             CreateMap<LoginCommand, ApplicationUser>().ReverseMap();
+            CreateMap<LoginCommand, AuthRequest>().ReverseMap();
             CreateMap<RegisterCommand, ApplicationUser>().ReverseMap();
             #endregion UserAccount
+            #region Companies
+            CreateMap<AddCompanyCommand, Company>().ReverseMap();
+            CreateMap<UpdateCompanyCommand, Company>().ReverseMap();
+            #endregion Companies
+
+            #region Stores
+            CreateMap<AddStoreCommand, Store>().ReverseMap();
+            CreateMap<UpdateStoreCommand, Store>().ReverseMap();
+            #endregion Stores
+
+            #region  Sales
+            CreateMap<AddSaleCommand, Sales>().ReverseMap();
+            CreateMap<UpdateSaleCommand, Sales>().ReverseMap();
+            #endregion Sales
         }
     }
 }

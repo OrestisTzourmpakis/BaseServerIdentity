@@ -15,6 +15,9 @@ using Microsoft.IdentityModel.Tokens;
 using Server.Application.Models.Identity;
 using System.Text;
 using Server.Infrastructure.Authentication;
+using Microsoft.Extensions.Logging;
+using Server.Infrastructure.Mail;
+using Server.Infrastructure.Options;
 
 namespace Server.Infrastructure
 {
@@ -36,11 +39,17 @@ namespace Server.Infrastructure
             // var connectionString = "Server=localhost,1434;database=Spatial;User Id=sa;password=Orestis123!;";
             var connectionString = configuration.GetSection("ConnectionStrings:ServerDatabase").Value;
             services.AddDbContext<ServerDbContext>(
-                options => options.UseSqlServer(connectionString)
+                options => options.UseSqlServer(connectionString).LogTo(Console.WriteLine, LogLevel.Information)
             );
+
+            // Email
+            services.Configure<MailOptions>(configuration.GetSection(MailOptions.Mail));
+            services.AddTransient<IEmailSender, EmailSender>();
 
             // Authentication
             services.AddTransient<IAuthService, AuthService>();
+            services.AddTransient<IUnitOfWork, UnitOfWork>();
+
             // we tell the authentication scheme to use jwt scheme
             services.AddAuthentication(options =>
             {
