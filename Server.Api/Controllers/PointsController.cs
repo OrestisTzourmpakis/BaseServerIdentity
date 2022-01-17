@@ -56,9 +56,9 @@ namespace Server.Api.Controllers
 
         [HttpGet]
         [Route("getUserPointsPerCompany")]
-        public async Task<IActionResult> GetUserPointsAllCompanies(int id)
+        public async Task<IActionResult> GetUserPointsPerCompany(string id)
         {
-            return Ok(await _mediator.Send(new GetUsersPointsPerCompanyQuery() { CompanyId = id }));
+            return Ok(await _mediator.Send(new GetUsersPointsPerCompanyQuery() { UserId = id }));
         }
 
         [HttpGet]

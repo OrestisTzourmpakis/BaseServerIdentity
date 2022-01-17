@@ -11,6 +11,7 @@ using Server.Application.Exceptions;
 using Server.Application.Features.UserAccount.Commands.Login;
 using Server.Application.Features.UserAccount.Commands.Register;
 using Server.Domain.Models;
+using Server.Infrastructure.Persistence;
 
 namespace Server.Infrastructure.Repositories
 {
@@ -37,6 +38,11 @@ namespace Server.Infrastructure.Repositories
             var saveUser = await _userManager.CreateAsync(_mapper.Map<ApplicationUser>(user), user.Password);
             if (!saveUser.Succeeded)
                 throw new ValidationException(saveUser.Errors);
+            if (user.Owner)
+            {
+                var currentUser = await _userManager.FindByEmailAsync(user.Email);
+                var rolesResult = await _userManager.AddToRoleAsync(currentUser, Roles.CompanyOwner.ToString());
+            }
             return true;
         }
     }

@@ -7,12 +7,13 @@ using System.Threading.Tasks;
 using MediatR;
 using Server.Application.Contracts;
 using Server.Application.Responses;
+using Server.Domain.Models;
 
 namespace Server.Application.Features.Points.Queries
 {
     public class GetUsersPointsPerCompanyQuery : IRequest<BaseResponse>
     {
-        public int CompanyId { get; set; }
+        public string UserId { get; set; }
     }
 
     public class GetUsersPointsPerCompanyQueryHandler : IRequestHandler<GetUsersPointsPerCompanyQuery, BaseResponse>
@@ -26,11 +27,11 @@ namespace Server.Application.Features.Points.Queries
 
         public async Task<BaseResponse> Handle(GetUsersPointsPerCompanyQuery request, CancellationToken cancellationToken)
         {
-            var includesList = new List<Expression<Func<Domain.Models.Points, object>>>() { c => c.ApplicationUser };
-            var result = await _unitOfWork.Points.GetAsync(c => c.CompanyId == request.CompanyId, includes: includesList);
+            var includesList = new List<Expression<Func<Company, object>>>() { c => c.Points };
+            var result = await _unitOfWork.Companies.GetByIdAsync(c => c.ApplicationUserId == request.UserId, includes: includesList);
             return new BaseResponse()
             {
-                data = result
+                data = result.Points
             };
         }
     }

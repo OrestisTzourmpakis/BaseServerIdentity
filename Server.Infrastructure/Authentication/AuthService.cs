@@ -11,6 +11,7 @@ using Microsoft.IdentityModel.Tokens;
 using Server.Application.Contracts;
 using Server.Application.Models.Identity;
 using Server.Domain.Models;
+using Server.Infrastructure.Persistence;
 
 namespace Server.Infrastructure.Authentication
 {
@@ -19,12 +20,14 @@ namespace Server.Infrastructure.Authentication
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly SignInManager<ApplicationUser> _signInManager;
         private readonly JwtSettings _jwtSettings;
+        private readonly IUnitOfWork _unitOfWork;
 
-        public AuthService(UserManager<ApplicationUser> userManager, SignInManager<ApplicationUser> signInManager, IOptions<JwtSettings> jwtSettings)
+        public AuthService(UserManager<ApplicationUser> userManager, SignInManager<ApplicationUser> signInManager, IUnitOfWork unitOfWork, IOptions<JwtSettings> jwtSettings)
         {
             _userManager = userManager;
             _signInManager = signInManager;
             _jwtSettings = jwtSettings.Value;
+            _unitOfWork = unitOfWork;
         }
 
         public async Task<AuthResponse> Login(AuthRequest request)
@@ -36,7 +39,13 @@ namespace Server.Infrastructure.Authentication
             var result = await _signInManager.PasswordSignInAsync(user.UserName, request.Password, false, lockoutOnFailure: false);
             if (!result.Succeeded)
                 throw new Exception($"Credentials for '{request.Email} aren't valid'.");
-
+            int? companyId = null;
+            if (roles.Contains(Roles.CompanyOwner.ToString()))
+            {
+                // get the company id 
+                var company = await _unitOfWork.Companies.GetByIdAsync(c => c.ApplicationUserId == user.Id);
+                if (company != null) companyId = company.Id;
+            }
             JwtSecurityToken jwtSecurityToken = await GenerateToken(user, roles);
             AuthResponse response = new AuthResponse
             {
@@ -44,7 +53,8 @@ namespace Server.Infrastructure.Authentication
                 Token = new JwtSecurityTokenHandler().WriteToken(jwtSecurityToken),
                 Email = user.Email,
                 UserName = user.UserName,
-                Roles = roles
+                Roles = roles,
+                CompanyId = companyId
 
             };
             return response;

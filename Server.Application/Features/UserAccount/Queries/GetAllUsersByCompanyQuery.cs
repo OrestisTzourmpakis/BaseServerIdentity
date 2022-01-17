@@ -13,7 +13,7 @@ namespace Server.Application.Features.UserAccount.Queries
 {
     public class GetAllUsersByCompanyQuery : IRequest<BaseResponse>
     {
-        public int CompanyId { get; set; }
+        public string userId { get; set; }
     }
 
     public class GetAllUsersByCompanyQueryHandler : IRequestHandler<GetAllUsersByCompanyQuery, BaseResponse>
@@ -29,7 +29,7 @@ namespace Server.Application.Features.UserAccount.Queries
         {
             // get all the users by company!!
             var includeList = new List<Expression<Func<Domain.Models.Points, object>>>() { c => c.ApplicationUser };
-            var result = await _unitOfWork.Points.GetAsync(c => c.CompanyId == request.CompanyId, includes: includeList);
+            var result = await _unitOfWork.Points.GetAsync(c => c.ApplicationUserId == request.userId, includes: includeList);
             return new BaseResponse()
             {
                 data = result
