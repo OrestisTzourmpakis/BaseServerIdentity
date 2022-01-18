@@ -7,6 +7,9 @@ namespace Server.Application.Contracts
 {
     public interface IEmailSender
     {
-        Task SendEmailAsync(string email, string subject, string htmlMessage);
+        void SendEmailAsync(string to, string subject, string content);
+        void SendEmailVerificationLink(string to, string subject, string link);
+        void SendEmaiForgotPassowrdLink(string to, string subject, string link);
+
     }
 }

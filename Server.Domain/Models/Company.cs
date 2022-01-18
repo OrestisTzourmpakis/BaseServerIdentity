@@ -20,6 +20,7 @@ namespace Server.Domain.Models
 
         public string ApplicationUserId { get; set; }
         public ICollection<Store> Stores { get; set; }
+        public ICollection<Sales> Sales { get; set; }
         public ICollection<Points> Points { get; set; }
 
         public ApplicationUser Owner { get; set; }

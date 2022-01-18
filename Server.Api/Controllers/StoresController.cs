@@ -29,7 +29,7 @@ namespace Server.Api.Controllers
             _mapper = mapper;
         }
 
-        [Authorize(Roles = nameof(Roles.Administrator))]
+        [Authorize(Roles = $"{nameof(Roles.Administrator)},{nameof(Roles.CompanyOwner)}")]
         [HttpPost]
         [Route("addStore")]
         public async Task<IActionResult> AddStore([FromBody] AddStoreCommand store)
@@ -45,12 +45,12 @@ namespace Server.Api.Controllers
             return Ok(await _mediator.Send(new GetAllStoresQuery()));
         }
 
-        [Authorize(Roles = nameof(Roles.Administrator))]
+        [AllowAnonymous]
         [HttpGet]
         [Route("getStores")]
-        public async Task<IActionResult> GetStores(string id)
+        public async Task<IActionResult> GetStores(string email = "", int? id = null)
         {
-            return Ok(await _mediator.Send(new GetStoreByCompanyQuery() { UserId = id }));
+            return Ok(await _mediator.Send(new GetStoreByCompanyQuery() { Email = email, CompanyId = id }));
         }
 
         [Authorize(Roles = nameof(Roles.Administrator))]

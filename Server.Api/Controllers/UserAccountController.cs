@@ -25,20 +25,37 @@ namespace Server.Api.Controllers
         private readonly IMediator _mediator;
         private readonly IAuthService _authService;
         private readonly IMapper _mapper;
+        private readonly IEmailSender _email;
 
-        public UserAccountController(IMediator mediator, IAuthService authService, IMapper mapper)
+        public UserAccountController(IMediator mediator, IAuthService authService, IMapper mapper, IEmailSender email)
         {
             _mediator = mediator;
             _authService = authService;
             _mapper = mapper;
+            _email = email;
         }
 
         [HttpGet]
         [Route("test")]
-        public IActionResult Test()
+        public IActionResult Test(int id)
         {
             // var command = new UserAccountCommand();
             // var response = await _mediator.Send(command);
+            if (id == 1)
+            {
+
+                _email.SendEmailAsync("otzurbakis13@gmail.com", "Hello there", "This is the content");
+            }
+            else if (id == 2)
+            {
+                _email.SendEmailVerificationLink("otzurbakis13@gmail.com", "Hello there", "This is the link");
+
+            }
+            else if (id == 3)
+            {
+                _email.SendEmaiForgotPassowrdLink("otzurbakis13@gmail.com", "Hello there", "This is the link");
+
+            }
             return Ok();
         }
         [HttpPost]
@@ -85,9 +102,9 @@ namespace Server.Api.Controllers
 
         [HttpGet]
         [Route("getUsersByCompany")]
-        public async Task<IActionResult> GetUsersByCompany(string id)
+        public async Task<IActionResult> GetUsersByCompany(string email)
         {
-            return Ok(await _mediator.Send(new GetAllUsersByCompanyQuery() { userId = id }));
+            return Ok(await _mediator.Send(new GetAllUsersByCompanyQuery() { Email = email }));
         }
 
         [HttpGet]

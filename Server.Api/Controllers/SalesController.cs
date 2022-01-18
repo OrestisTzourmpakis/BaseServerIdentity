@@ -25,9 +25,9 @@ namespace Server.Api.Controllers
 
         [HttpGet]
         [Route("getSales")]
-        public async Task<IActionResult> GetSalesByCompanyId(int id)
+        public async Task<IActionResult> GetSalesUserEmail(string email)
         {
-            return Ok(await _mediator.Send(new GetSalesQuery() { CompanyId = id }));
+            return Ok(await _mediator.Send(new GetSalesQuery() { Email = email }));
         }
 
         [HttpGet]

@@ -49,9 +49,9 @@ namespace Server.Api.Controllers
         [Authorize(Roles = nameof(Roles.Administrator))]
         [HttpGet]
         [Route("getCompanyById")]
-        public async Task<IActionResult> GetCompanyById(int id)
+        public async Task<IActionResult> GetCompanyById(string email)
         {
-            return Ok(await _mediator.Send(new GetCompanyByIdQuery() { Id = id }));
+            return Ok(await _mediator.Send(new GetCompanyByIdQuery() { Email = email }));
         }
 
         [Authorize(Roles = nameof(Roles.Administrator))]
