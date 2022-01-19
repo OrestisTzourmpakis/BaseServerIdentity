@@ -20,7 +20,7 @@ namespace Server.Api.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
-    public class UserAccountController : ControllerBase
+    public class UserAccountController : Controller
     {
         private readonly IMediator _mediator;
         private readonly IAuthService _authService;
@@ -112,6 +112,13 @@ namespace Server.Api.Controllers
         public async Task<IActionResult> GetAllUsers()
         {
             return Ok(await _mediator.Send(new GetAllUsersQuery()));
+        }
+
+        [HttpGet]
+        [Route("requestResetPassword")]
+        public async Task<IActionResult> RequestResetPassword()
+        {
+            return View("Views/ConfirmationEmailView.cshtml");
         }
     }
 }

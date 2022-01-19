@@ -17,15 +17,13 @@
     <ProjectReference Include="../Server.Application/Server.Application.csproj"/>
     <ProjectReference Include="../Server.Infrastructure/Server.Infrastructure.csproj"/>
   </ItemGroup>
-   <ItemGroup>
-    <EmbeddedResource Include="Utilities/EmailTemplates/EmailVerificationTemplate.html" >
-    
+  <ItemGroup>
+    <EmbeddedResource Include="Utilities/EmailTemplates/EmailVerificationTemplate.html">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </EmbeddedResource>
   </ItemGroup>
-    <ItemGroup>
-    <EmbeddedResource Include="Utilities/EmailTemplates/ResetPasswordTemplate.html" >
-    
+  <ItemGroup>
+    <EmbeddedResource Include="Utilities/EmailTemplates/ResetPasswordTemplate.html">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </EmbeddedResource>
   </ItemGroup>

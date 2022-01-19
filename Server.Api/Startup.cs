@@ -48,7 +48,6 @@ namespace Server.Api
             op.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore); ;
             services.ConfigureApplicationServices();
             services.ConfigureInfrastructureServices(Configuration);
-
             services.Configure<SwaggerOptions>(Configuration.GetSection(nameof(SwaggerOptions)));
             AddSwaggerDoc(services);
         }
@@ -77,7 +76,6 @@ namespace Server.Api
             app.UseRouting();
 
             app.UseAuthorization();
-
             // Enable Swagger
             app.UseSwagger();
             // app.UseDeveloperExceptionPage();
