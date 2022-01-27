@@ -10,6 +10,7 @@ using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using Server.Application.Contracts;
 using Server.Application.Models.Identity;
+using Server.Application.Utilities;
 using Server.Domain.Models;
 using Server.Infrastructure.Persistence;
 
@@ -35,12 +36,14 @@ namespace Server.Infrastructure.Authentication
             var user = await _userManager.FindByEmailAsync(request.Email);
             if (user == null)
                 throw new Exception($"User with {request.Email} not found.");
+            if (!user.EmailConfirmed)
+                throw new Exception("Please validate your email first.");
             var roles = await _userManager.GetRolesAsync(user);
             var result = await _signInManager.PasswordSignInAsync(user.UserName, request.Password, false, lockoutOnFailure: false);
             if (!result.Succeeded)
                 throw new Exception($"Credentials for '{request.Email} aren't valid'.");
             int? companyId = null;
-            if (roles.Contains(Roles.CompanyOwner.ToString()))
+            if (roles.Contains(UserRoles.CompanyOwner.ToString()))
             {
                 // get the company id 
                 var company = await _unitOfWork.Companies.GetByIdAsync(c => c.ApplicationUserId == user.Id);

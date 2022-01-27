@@ -9,6 +9,7 @@ using Microsoft.AspNetCore.Mvc;
 using Server.Application.Contracts;
 using Server.Application.Features.Companies.Commands;
 using Server.Application.Features.Companies.Queries;
+using Server.Application.Utilities;
 using Server.Infrastructure.Persistence;
 
 namespace Server.Api.Controllers
@@ -29,7 +30,7 @@ namespace Server.Api.Controllers
             _mapper = mapper;
         }
 
-        [Authorize(Roles = nameof(Roles.Administrator))]
+        [Authorize(Roles = nameof(UserRoles.Administrator))]
         [HttpPost]
         [Route("addCompany")]
         public async Task<IActionResult> AddCompany([FromBody] AddCompanyCommand company)
@@ -38,7 +39,8 @@ namespace Server.Api.Controllers
             return Ok(await _mediator.Send(company));
         }
 
-        [Authorize(Roles = nameof(Roles.Administrator))]
+        //[Authorize(Roles = nameof(Roles.Administrator))]
+        [AllowAnonymous]
         [HttpGet]
         [Route("getAllCompanies")]
         public async Task<IActionResult> GetAllCompanies()
@@ -46,7 +48,7 @@ namespace Server.Api.Controllers
             return Ok(await _mediator.Send(new GetAllCompaniesQuery()));
         }
 
-        [Authorize(Roles = nameof(Roles.Administrator))]
+        [Authorize(Roles = nameof(UserRoles.Administrator))]
         [HttpGet]
         [Route("getCompanyById")]
         public async Task<IActionResult> GetCompanyById(string email)
@@ -54,7 +56,7 @@ namespace Server.Api.Controllers
             return Ok(await _mediator.Send(new GetCompanyByIdQuery() { Email = email }));
         }
 
-        [Authorize(Roles = nameof(Roles.Administrator))]
+        [Authorize(Roles = $"{nameof(UserRoles.Administrator)},{nameof(UserRoles.CompanyOwner)}")]
         [HttpPost]
         [Route("addUserToCompany")]
         public async Task<IActionResult> AddUserToCompany([FromBody] AddUserCompanyCommand user)
@@ -62,7 +64,7 @@ namespace Server.Api.Controllers
             return Ok(await _mediator.Send(user));
         }
 
-        [Authorize(Roles = nameof(Roles.Administrator))]
+        [Authorize(Roles = nameof(UserRoles.Administrator))]
         [HttpDelete]
         [Route("deleteCompany")]
         public async Task<IActionResult> DeleteCompany(int id)
@@ -70,7 +72,7 @@ namespace Server.Api.Controllers
             return Ok(await _mediator.Send(new DeleteCompanyCommand() { Id = id }));
         }
 
-        [Authorize(Roles = nameof(Roles.Administrator))]
+        [Authorize(Roles = nameof(UserRoles.Administrator))]
         [HttpPut]
         [Route("updateCompany")]
         public async Task<IActionResult> UpdateCompany([FromBody] UpdateCompanyCommand company)

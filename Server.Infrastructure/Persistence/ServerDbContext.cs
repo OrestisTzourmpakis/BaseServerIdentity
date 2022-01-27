@@ -10,11 +10,7 @@ using Server.Domain.Models;
 
 namespace Server.Infrastructure.Persistence
 {
-    public enum Roles
-    {
-        Administrator,
-        CompanyOwner
-    }
+
     public class ServerDbContext : IdentityDbContext<ApplicationUser>
     {
         public ServerDbContext(DbContextOptions options) : base(options)

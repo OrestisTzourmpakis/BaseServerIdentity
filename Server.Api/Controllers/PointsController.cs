@@ -9,6 +9,7 @@ using Microsoft.AspNetCore.Mvc;
 using Server.Application.Contracts;
 using Server.Application.Features.Points.Commands;
 using Server.Application.Features.Points.Queries;
+using Server.Application.Utilities;
 using Server.Infrastructure.Persistence;
 
 namespace Server.Api.Controllers
@@ -29,7 +30,7 @@ namespace Server.Api.Controllers
         }
 
 
-        [Authorize(Roles = nameof(Roles.Administrator))]
+        [Authorize(Roles = nameof(UserRoles.Administrator))]
         [HttpPost]
         [Route("addPoints")]
         public async Task<IActionResult> AddPoints([FromBody] AddUserPointsCommand model)
@@ -37,7 +38,7 @@ namespace Server.Api.Controllers
             return Ok(await _mediator.Send(model));
         }
 
-        [Authorize(Roles = nameof(Roles.Administrator))]
+        [Authorize(Roles = nameof(UserRoles.Administrator))]
         [HttpPost]
         [Route("getPoints")]
         public IActionResult GetPoints()
@@ -45,7 +46,7 @@ namespace Server.Api.Controllers
             return Ok("bhke boy");
         }
 
-        [Authorize(Roles = nameof(Roles.Administrator))]
+        [Authorize(Roles = nameof(UserRoles.Administrator))]
         [HttpPut]
         [Route("setPoints")]
         public async Task<IActionResult> SetPoints([FromBody] UpdateUserPointsCommand model)

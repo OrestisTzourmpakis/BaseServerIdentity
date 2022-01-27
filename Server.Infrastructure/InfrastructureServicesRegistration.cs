@@ -18,6 +18,7 @@ using Server.Infrastructure.Authentication;
 using Microsoft.Extensions.Logging;
 using Server.Infrastructure.Mail;
 using Server.Infrastructure.Options;
+using Server.Infrastructure.Helper;
 
 namespace Server.Infrastructure
 {
@@ -31,7 +32,7 @@ namespace Server.Infrastructure
                      {
                          q.Password.RequiredLength = 8;
                          q.Password.RequiredUniqueChars = 3;
-                         q.SignIn.RequireConfirmedEmail = false;
+                         q.SignIn.RequireConfirmedEmail = true;
                      }).AddRoles<IdentityRole>().AddEntityFrameworkStores<ServerDbContext>().AddDefaultTokenProviders();
             // builder = new IdentityBuilder(builder.UserType, typeof(IdentityRole), services);
             // builder.AddEntityFrameworkStores<SpatialDbContext>().AddDefaultTokenProviders();
@@ -49,6 +50,9 @@ namespace Server.Infrastructure
             // Authentication
             services.AddTransient<IAuthService, AuthService>();
             services.AddTransient<IUnitOfWork, UnitOfWork>();
+
+            // HttpContextAccessor
+            services.AddTransient<IHttpContextAccessorWrapper, HttpContextAccessorWrapperRepository>();
 
             // we tell the authentication scheme to use jwt scheme
             services.AddAuthentication(options =>

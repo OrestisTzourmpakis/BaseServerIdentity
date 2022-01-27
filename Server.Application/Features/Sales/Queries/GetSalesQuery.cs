@@ -34,9 +34,10 @@ namespace Server.Application.Features.Sales.Queries
             var user = await _userManager.FindByEmailAsync(request.Email);
             var includeList = new List<Expression<Func<Company, object>>>() { c => c.Sales };
             var result = await _unitOfWork.Companies.GetByIdAsync(c => c.ApplicationUserId == user.Id, includes: includeList);
+            var sales = new List<Domain.Models.Sales>();
             return new BaseResponse()
             {
-                data = result.Sales
+                data = result == null ? sales : result.Sales
             };
         }
     }

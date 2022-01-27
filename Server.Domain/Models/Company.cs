@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -17,7 +18,6 @@ namespace Server.Domain.Models
         public string Facebook { get; set; }
         public double PointsToEuroRatio { get; set; }
         public double EuroToPointsRatio { get; set; }
-
         public string ApplicationUserId { get; set; }
         public ICollection<Store> Stores { get; set; }
         public ICollection<Sales> Sales { get; set; }

@@ -2,8 +2,32 @@
     ViewData["Title"] = "ConfirmationEmailView";
 }
 
+<!DOCTYPE html>
 <h1>@ViewData["Title"]</h1>
 
-<div>
-    <h3>Hello there from the View</h3>
-</div>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>ConfirmationEmailView</title>
+    <link href="~/lib/twitter-bootstrap/css/bootstrap.min.css" rel="stylesheet" />
+    <link href="~/font-awesome/css/all.css" rel="stylesheet" />
+</head>
+
+<body style="background-color:#182350;">
+    <div style="padding:20px; text-align:center;">
+        @if (Model.Success)
+        {
+            <span><i class="fa fa-check-circle" aria-hidden="true" style="color:lime; font-size:100px;"></i></span>
+            <h1 style="color:white;">The Email Verification successfully completed!</h1>
+        }
+        else
+        {
+            <span><i class="fa fa-exclamation-circle" aria-hidden="true" style="color:orange; font-size:100px;"></i></span>
+            <h1 style="color:white">The Email Verification not completed. An issue occured, please try again later...</h1>
+        }
+    </div>
+</body>
+
+</html>

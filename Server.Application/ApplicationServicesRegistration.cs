@@ -17,6 +17,13 @@ namespace Server.Application
             services.AddAutoMapper(Assembly.GetExecutingAssembly());
             // services.AddValidatorsFromAssembly(Assembly.GetExecutingAssembly());
             services.AddMediatR(Assembly.GetExecutingAssembly());
+            // google authentication!!
+            services.AddAuthentication()
+                .AddGoogle(options =>
+                {
+                    options.ClientId = "715533597070-a5oamiocsjaheqnvirc55g1j14avef47.apps.googleusercontent.com";
+                    options.ClientSecret = "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";
+                });
             return services;
         }
     }

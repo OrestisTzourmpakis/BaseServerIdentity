@@ -5,9 +5,11 @@ using System.Linq.Expressions;
 using System.Threading;
 using System.Threading.Tasks;
 using AutoMapper;
+using FluentValidation.Results;
 using MediatR;
 using Microsoft.AspNetCore.Identity;
 using Server.Application.Contracts;
+using Server.Application.Exceptions;
 using Server.Application.Responses;
 using Server.Application.Utilities;
 using Server.Domain.Models;
@@ -55,6 +57,12 @@ namespace Server.Application.Features.Companies.Commands
             {
                 validationException = new ExceptionThrowHelper("Role", $"User with email: {request.Email} is not authorized to create a company!");
                 validationException.Throw();
+            }
+            var checkCompany = await _unitOfWork.Companies.GetByIdAsync(c => c.ApplicationUserId == user.Id);
+            if (checkCompany != null)
+            {
+                var failure = new ValidationFailure("Id", $"User with email: {request.Email} is already registered to a company.");
+                throw new ValidationException(new List<ValidationFailure>() { failure });
             }
             request.ApplicationUserId = user.Id;
             var company = await _unitOfWork.Companies.AddAsync(_mapper.Map<Company>(request));

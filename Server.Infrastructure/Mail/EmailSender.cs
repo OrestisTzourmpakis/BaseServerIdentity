@@ -5,6 +5,7 @@ using System.Linq;
 using System.Net;
 using System.Net.Mail;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Options;
 using Server.Application.Contracts;
 using Server.Infrastructure.Options;
@@ -19,11 +20,15 @@ namespace Server.Infrastructure.Mail
     }
     public class EmailSender : IEmailSender
     {
+        private string baseUrl;
         private MailOptions _mailOptions;
+        private readonly IHttpContextAccessor _httpContextAccessor;
 
-        public EmailSender(IOptionsSnapshot<MailOptions> mailOptions)
+        public EmailSender(IOptionsSnapshot<MailOptions> mailOptions, IHttpContextAccessor httpContextAccessor)
         {
             _mailOptions = mailOptions.Value;
+            _httpContextAccessor = httpContextAccessor;
+            baseUrl = _httpContextAccessor.HttpContext.Request.Scheme + "://" + _httpContextAccessor.HttpContext.Request.Host.Value + "/";
         }
 
 

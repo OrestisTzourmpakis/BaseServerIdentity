@@ -9,6 +9,7 @@ using Microsoft.AspNetCore.Mvc;
 using Server.Application.Contracts;
 using Server.Application.Features.Stores.Commands;
 using Server.Application.Features.Stores.Queries;
+using Server.Application.Utilities;
 using Server.Infrastructure.Persistence;
 
 namespace Server.Api.Controllers
@@ -29,7 +30,7 @@ namespace Server.Api.Controllers
             _mapper = mapper;
         }
 
-        [Authorize(Roles = $"{nameof(Roles.Administrator)},{nameof(Roles.CompanyOwner)}")]
+        [Authorize(Roles = $"{nameof(UserRoles.Administrator)},{nameof(UserRoles.CompanyOwner)}")]
         [HttpPost]
         [Route("addStore")]
         public async Task<IActionResult> AddStore([FromBody] AddStoreCommand store)
@@ -37,7 +38,7 @@ namespace Server.Api.Controllers
             return Ok(await _mediator.Send(store));
         }
 
-        [Authorize(Roles = nameof(Roles.Administrator))]
+        [Authorize(Roles = nameof(UserRoles.Administrator))]
         [HttpGet]
         [Route("getAllStores")]
         public async Task<IActionResult> GetAllStores()
@@ -53,7 +54,7 @@ namespace Server.Api.Controllers
             return Ok(await _mediator.Send(new GetStoreByCompanyQuery() { Email = email, CompanyId = id }));
         }
 
-        [Authorize(Roles = nameof(Roles.Administrator))]
+        [Authorize(Roles = nameof(UserRoles.Administrator))]
         [HttpDelete]
         [Route("deleteStore")]
         public async Task<IActionResult> DeleteStore(int id)
@@ -61,7 +62,7 @@ namespace Server.Api.Controllers
             return Ok(await _mediator.Send(new DeleteStoreCommand() { Id = id }));
         }
 
-        [Authorize(Roles = nameof(Roles.Administrator))]
+        [Authorize(Roles = nameof(UserRoles.Administrator))]
         [HttpPut]
         [Route("updateStore")]
         public async Task<IActionResult> UpdateStore([FromBody] UpdateStoreCommand store)

@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.DependencyInjection;
 using Server.Domain.Models;
-using persistence = Server.Infrastructure.Persistence;
+using Server.Application.Utilities;
 
 namespace Server.Infrastructure.Configurations.Roles
 {
@@ -19,7 +19,7 @@ namespace Server.Infrastructure.Configurations.Roles
 
                 var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole>>();
                 var userManager = scope.ServiceProvider.GetRequiredService<UserManager<ApplicationUser>>();
-                foreach (var role in Enum.GetNames(typeof(persistence.Roles)))
+                foreach (var role in Enum.GetNames(typeof(UserRoles)))
                 {
                     if (!await roleManager.RoleExistsAsync(role))
                     {
@@ -48,8 +48,8 @@ namespace Server.Infrastructure.Configurations.Roles
                     UserName = "companyOwnerTest1",
                     Email = "o.tzourmpakis@gmail.com"
                 };
-                await SeedUsersHelper(userManager, adminUser, "Orestis123!", nameof(persistence.Roles.Administrator));
-                await SeedUsersHelper(userManager, companyOwnerUser, "Orestis123!", nameof(persistence.Roles.CompanyOwner));
+                await SeedUsersHelper(userManager, adminUser, "Orestis123!", nameof(UserRoles.Administrator));
+                await SeedUsersHelper(userManager, companyOwnerUser, "Orestis123!", nameof(UserRoles.CompanyOwner));
                 // var checkAdmin = await userManager.FindByEmailAsync(adminUser.Email);
                 // var checkStoreOwner = await userManager.FindByEmailAsync(storeOwnerUser.Email);
                 // if (checkAdmin == null)

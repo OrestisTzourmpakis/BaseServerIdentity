@@ -269,7 +269,7 @@ namespace Server.Infrastructure.Migrations
                         .IsUnique()
                         .HasFilter("[ApplicationUserId] IS NOT NULL");
 
-                    b.ToTable("Companies");
+                    b.ToTable("Companies", (string)null);
                 });
 
             modelBuilder.Entity("Server.Domain.Models.Points", b =>
@@ -287,7 +287,7 @@ namespace Server.Infrastructure.Migrations
 
                     b.HasIndex("CompanyId");
 
-                    b.ToTable("Points");
+                    b.ToTable("Points", (string)null);
                 });
 
             modelBuilder.Entity("Server.Domain.Models.PointsHistory", b =>
@@ -314,7 +314,7 @@ namespace Server.Infrastructure.Migrations
 
                     b.HasIndex("CompanyId");
 
-                    b.ToTable("PointsHistory");
+                    b.ToTable("PointsHistory", (string)null);
                 });
 
             modelBuilder.Entity("Server.Domain.Models.Sales", b =>
@@ -347,7 +347,7 @@ namespace Server.Infrastructure.Migrations
 
                     b.HasIndex("CompanyId");
 
-                    b.ToTable("Sales");
+                    b.ToTable("Sales", (string)null);
                 });
 
             modelBuilder.Entity("Server.Domain.Models.Store", b =>
@@ -369,7 +369,7 @@ namespace Server.Infrastructure.Migrations
 
                     b.HasIndex("CompanyId");
 
-                    b.ToTable("Stores");
+                    b.ToTable("Stores", (string)null);
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>

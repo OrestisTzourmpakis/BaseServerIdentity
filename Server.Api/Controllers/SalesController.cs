@@ -46,7 +46,7 @@ namespace Server.Api.Controllers
 
         [HttpPost]
         [Route("addSale")]
-        public async Task<IActionResult> GetUsersByCompany([FromBody] AddSaleCommand model)
+        public async Task<IActionResult> AddSale([FromForm] AddSaleCommand model)
         {
             return Ok(await _mediator.Send(model));
         }

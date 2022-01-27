@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using MediatR;
 using Server.Application.Contracts;
 using Server.Application.Responses;
+using Server.Application.Utilities;
 
 namespace Server.Application.Features.Points.Commands
 {
@@ -28,6 +29,12 @@ namespace Server.Application.Features.Points.Commands
         {
             // update the points first and then add to the history!!!
             var userPoints = await _unitOfWork.Points.GetByIdAsync(c => c.ApplicationUserId == request.UserId && c.CompanyId == request.CompanyId);
+            var pointsDifference = userPoints.Total + request.Points;
+            if (pointsDifference < 0)
+            {
+                var pointsExceededError = new ExceptionThrowHelper("Points", $"Not enough user points!");
+                pointsExceededError.Throw();
+            }
             userPoints.Total = userPoints.Total + request.Points;
             await _unitOfWork.Points.UpdateAsync(userPoints);
             await _unitOfWork.PointsHistory.AddAsync(new Domain.Models.PointsHistory() { ApplicationUserId = request.UserId, CompanyId = request.CompanyId, Transaction = request.Points });

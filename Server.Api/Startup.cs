@@ -1,5 +1,7 @@
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.AspNetCore.HttpsPolicy;
 using Microsoft.AspNetCore.Server.Kestrel.Core;
 using Microsoft.Extensions.Configuration;
@@ -26,26 +28,39 @@ namespace Server.Api
         {
             Configuration = configuration;
         }
-
+        readonly string MyAllowSpecificOrigins = "_myAllowSpecificOrigins";
         public IConfiguration Configuration { get; }
 
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+
             // CORS - allow everything here
             #region CORS
             services.AddCors(o =>
             {
                 o.AddPolicy("AllowAll", builder =>
-                 builder.AllowAnyOrigin()
-                 .AllowAnyMethod()
-                 .AllowAnyHeader());
+                    builder.AllowAnyOrigin()
+                    .AllowAnyMethod()
+                    .AllowAnyHeader());
             });
+            //         services.AddCors(options =>
+            //   {
+            //       options.AddPolicy(MyAllowSpecificOrigins,
+            //       builder =>
+            //       {
+            //           builder.SetIsOriginAllowed(isOriginAllowed: _ => true).AllowAnyHeader().AllowAnyMethod().AllowCredentials();
+            //       });
+            //   });
             #endregion
             services.Configure<KestrelServerOptions>(Configuration.GetSection("Kestrel"));
 
-            services.AddControllersWithViews().AddNewtonsoftJson(op =>
-            op.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore); ;
+            services.AddControllers().AddNewtonsoftJson(op =>
+            op.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore).ConfigureApiBehaviorOptions(options =>
+            {
+                options.SuppressModelStateInvalidFilter = true;
+            });
+            services.AddControllersWithViews();
             services.ConfigureApplicationServices();
             services.ConfigureInfrastructureServices(Configuration);
             services.Configure<SwaggerOptions>(Configuration.GetSection(nameof(SwaggerOptions)));
@@ -65,16 +80,24 @@ namespace Server.Api
                 // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
                 // app.UseHsts();
             }
-            app.UseCors("AllowAll");
+            //app.UseForwardedHeaders();
+            app.UseForwardedHeaders(new ForwardedHeadersOptions
+            {
+                ForwardedHeaders = ForwardedHeaders.XForwardedFor |
+                   ForwardedHeaders.XForwardedProto
+            });
+            app.UseHttpsRedirection();
+            app.UseStaticFiles();
+            //app.UseCors("AllowAll");
+
             // DataInitializer.SeedRoles(app.ApplicationServices).Wait();
             // DataInitializer.SeedUsers(app.ApplicationServices).Wait();
             app.UseMiddleware<ExceptionMiddleware>();
             app.UseAuthentication();
-            app.UseHttpsRedirection();
-            app.UseStaticFiles();
+
 
             app.UseRouting();
-
+            app.UseCors("AllowAll");
             app.UseAuthorization();
             // Enable Swagger
             app.UseSwagger();
