@@ -199,5 +199,13 @@ namespace Server.Api.Controllers
             return Ok(await _mediator.Send(new CheckUserRoleQuery() { Email = email }));
         }
 
+        [AllowAnonymous]
+        [HttpPost]
+        [Route("updateUser")]
+        public async Task<IActionResult> UpdateUser([FromBody] UpdateUserCommand model)
+        {
+            return Ok(await _mediator.Send(model));
+        }
+
     }
 }

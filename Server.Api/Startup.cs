@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.HttpsPolicy;
 using Microsoft.AspNetCore.Server.Kestrel.Core;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.FileProviders;
 using Microsoft.Extensions.Hosting;
 using Microsoft.OpenApi.Models;
 using Server.Api.Middleware;
@@ -87,7 +88,11 @@ namespace Server.Api
                    ForwardedHeaders.XForwardedProto
             });
             app.UseHttpsRedirection();
-            app.UseStaticFiles();
+            app.UseStaticFiles(new StaticFileOptions
+            {
+                FileProvider = new PhysicalFileProvider(Path.Combine(env.ContentRootPath, "Images")),
+                RequestPath = "/Images"
+            });
             //app.UseCors("AllowAll");
 
             // DataInitializer.SeedRoles(app.ApplicationServices).Wait();

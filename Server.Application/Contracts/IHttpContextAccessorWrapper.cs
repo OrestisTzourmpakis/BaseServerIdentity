@@ -8,5 +8,6 @@ namespace Server.Application.Contracts
     public interface IHttpContextAccessorWrapper
     {
         string ConstructUrl(string controllerAction, Dictionary<string, string> dict);
+        string GetUrl();
     }
 }

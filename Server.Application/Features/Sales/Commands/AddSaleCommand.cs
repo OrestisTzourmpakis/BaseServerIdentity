@@ -47,15 +47,23 @@ namespace Server.Application.Features.Sales.Commands
         public async Task<BaseResponse> Handle(AddSaleCommand request, CancellationToken cancellationToken)
         {
             // find the company id of the user
-            var imageName = await SaveImage(request.ImageFile);
+            // var imageName = await SaveImage(request.ImageFile, "SalesImage-");
             var user = await _userManager.FindByEmailAsync(request.Email);
+            ValidationFailure failure;
+            if (user == null)
+            {
+                failure = new ValidationFailure("Id", $"User with email: {request.Email} was not found.");
+                throw new ValidationException(new List<ValidationFailure>() { failure });
+            }
             var userCompany = await _unitOfWork.Companies.GetByIdAsync(c => c.ApplicationUserId == user.Id);
             if (userCompany == null)
             {
-                var failure = new ValidationFailure("Id", $"User with email: {request.Email} does not have a registered company.");
+                failure = new ValidationFailure("Id", $"User with email: {request.Email} does not have a registered company.");
                 throw new ValidationException(new List<ValidationFailure>() { failure });
             }
             request.CompanyId = userCompany.Id;
+            if (request.Image != null && request.ImageFile != null)
+                request.Image = await SaveImage(request.ImageFile, $"SalesImage-{request.CompanyId}-");
             var result = await _unitOfWork.Sales.AddAsync(_mapper.Map<Domain.Models.Sales>(request));
             await _unitOfWork.Save();
             return new BaseResponse()
@@ -64,9 +72,9 @@ namespace Server.Application.Features.Sales.Commands
             };
         }
 
-        private async Task<string> SaveImage(IFormFile imageFile)
+        private async Task<string> SaveImage(IFormFile imageFile, string namePreset)
         {
-            string imageName = Path.GetFileNameWithoutExtension(imageFile.FileName).Take(10).ToArray().ToString().Replace(' ', '-');
+            string imageName = namePreset;
             imageName = imageName + DateTime.Now.ToString("yymmssfff") + Path.GetExtension(imageFile.FileName);
             var imagePath = Path.Combine(_hostEnvironment.ContentRootPath, "Images", imageName);
             // save the image

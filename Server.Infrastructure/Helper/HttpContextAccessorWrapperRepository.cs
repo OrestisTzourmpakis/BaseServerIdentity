@@ -38,5 +38,10 @@ namespace Server.Infrastructure.Helper
             var finalUrl = hostController + queryString;
             return finalUrl;
         }
+
+        public string GetUrl()
+        {
+            return baseUrl;
+        }
     }
 }
