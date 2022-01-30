@@ -51,6 +51,9 @@ namespace Server.Infrastructure
             services.AddTransient<IAuthService, AuthService>();
             services.AddTransient<IUnitOfWork, UnitOfWork>();
 
+            // FileService
+            services.AddScoped<IFileService, FileService>();
+
             // HttpContextAccessor
             services.AddTransient<IHttpContextAccessorWrapper, HttpContextAccessorWrapperRepository>();
 

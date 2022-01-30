@@ -10,4 +10,5 @@ namespace Server.Application.Utilities
         Administrator,
         CompanyOwner
     }
+
 }

@@ -38,10 +38,14 @@ namespace Server.Infrastructure.Authentication
                 throw new Exception($"User with {request.Email} not found.");
             if (!user.EmailConfirmed)
                 throw new Exception("Please validate your email first.");
-            var roles = await _userManager.GetRolesAsync(user);
-            var result = await _signInManager.PasswordSignInAsync(user.UserName, request.Password, false, lockoutOnFailure: false);
+            SignInResult result = default(SignInResult);
+            if (!string.IsNullOrEmpty(request.ProviderKey) && !string.IsNullOrWhiteSpace(request.LoginProvider))
+                result = await _signInManager.ExternalLoginSignInAsync(request.LoginProvider, request.ProviderKey, isPersistent: false, bypassTwoFactor: true);
+            else
+                result = await _signInManager.PasswordSignInAsync(user.UserName, request.Password, false, lockoutOnFailure: false);
             if (!result.Succeeded)
                 throw new Exception($"Credentials for '{request.Email} aren't valid'.");
+            var roles = await _userManager.GetRolesAsync(user);
             int? companyId = null;
             if (roles.Contains(UserRoles.CompanyOwner.ToString()))
             {

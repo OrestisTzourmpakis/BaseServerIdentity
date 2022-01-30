@@ -34,14 +34,14 @@ namespace Server.Application.Features.Sales.Commands
         private readonly IUnitOfWork _unitOfWork;
         private readonly IMapper _mapper;
         private readonly UserManager<ApplicationUser> _userManager;
-        private readonly IWebHostEnvironment _hostEnvironment;
+        private readonly IFileService _fileService;
 
-        public AddSaleCommandHandler(IUnitOfWork unitOfWork, IMapper mapper, UserManager<ApplicationUser> userManager, IWebHostEnvironment hostEnvironment)
+        public AddSaleCommandHandler(IUnitOfWork unitOfWork, IMapper mapper, UserManager<ApplicationUser> userManager, IFileService fileService)
         {
             _unitOfWork = unitOfWork;
             _mapper = mapper;
             _userManager = userManager;
-            _hostEnvironment = hostEnvironment;
+            _fileService = fileService;
         }
 
         public async Task<BaseResponse> Handle(AddSaleCommand request, CancellationToken cancellationToken)
@@ -63,26 +63,13 @@ namespace Server.Application.Features.Sales.Commands
             }
             request.CompanyId = userCompany.Id;
             if (request.Image != null && request.ImageFile != null)
-                request.Image = await SaveImage(request.ImageFile, $"SalesImage-{request.CompanyId}-");
+                request.Image = await _fileService.SaveImage(request.ImageFile, $"SalesImage-{request.CompanyId}-");
             var result = await _unitOfWork.Sales.AddAsync(_mapper.Map<Domain.Models.Sales>(request));
             await _unitOfWork.Save();
             return new BaseResponse()
             {
                 data = result
             };
-        }
-
-        private async Task<string> SaveImage(IFormFile imageFile, string namePreset)
-        {
-            string imageName = namePreset;
-            imageName = imageName + DateTime.Now.ToString("yymmssfff") + Path.GetExtension(imageFile.FileName);
-            var imagePath = Path.Combine(_hostEnvironment.ContentRootPath, "Images", imageName);
-            // save the image
-            using (var fileStream = new FileStream(imagePath, FileMode.Create))
-            {
-                await imageFile.CopyToAsync(fileStream);
-            }
-            return imageName;
         }
     }
 }

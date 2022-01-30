@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Claims;
 using System.Threading.Tasks;
 using AutoMapper;
 using MediatR;
@@ -33,8 +34,9 @@ namespace Server.Api.Controllers
         private readonly IEmailSender _email;
         private readonly IUserAccount _userAccount;
         private readonly SignInManager<ApplicationUser> _signInManager;
+        private readonly UserManager<ApplicationUser> _userManager;
 
-        public UserAccountController(IMediator mediator, IAuthService authService, IMapper mapper, IEmailSender email, IUserAccount userAccount, SignInManager<ApplicationUser> signInManager)
+        public UserAccountController(IMediator mediator, IAuthService authService, IMapper mapper, IEmailSender email, IUserAccount userAccount, SignInManager<ApplicationUser> signInManager, UserManager<ApplicationUser> userManager)
         {
             _mediator = mediator;
             _authService = authService;
@@ -42,6 +44,7 @@ namespace Server.Api.Controllers
             _email = email;
             _userAccount = userAccount;
             _signInManager = signInManager;
+            _userManager = userManager;
         }
 
         [HttpPost]
@@ -185,10 +188,50 @@ namespace Server.Api.Controllers
         public async Task<IActionResult> ExternalLogin(string returnUrl = null, string remoteError = null)
         {
             returnUrl = returnUrl ?? Url.Content("~/");
-            var sth = await _signInManager.GetExternalLoginInfoAsync();
-            var headers = Response.Headers.ToList();
+            if (remoteError != null)
+            {
+                // show the errors!!! from the google authentication!!
+            }
+            // get the login information about the user from the external login provider!!!
+            var info = await _signInManager.GetExternalLoginInfoAsync();
+            if (info == null)
+            {
+                // failed to load the ecternal login information!!
+            }
+
+            // if the user already has a login ( i.e if there is a record in AspNetUserLogins table  ) then sign-in the user with this external login provider
+            var signInResult = await _signInManager.ExternalLoginSignInAsync(info.LoginProvider, info.ProviderKey, isPersistent: false, bypassTwoFactor: true);
+            if (signInResult.Succeeded)
+            {
+                // return success 
+            }
+            else
+            {
+                // den yparxei o xrhsths ston table auton ara prepei na ton dhmiourghsw!!!
+                var email = info.Principal.FindFirstValue(ClaimTypes.Email);
+                if (email != null)
+                {
+                    // create a new user without password if we do not have a user already
+                    var user = await _userManager.FindByEmailAsync(email);
+                    if (user == null)
+                    {
+                        // create new user 
+                        user = new ApplicationUser
+                        {
+                            UserName = info.Principal.FindFirstValue(ClaimTypes.Email),
+                            Email = info.Principal.FindFirstValue(ClaimTypes.Email),
+                            EmailConfirmed = true
+                        };
+                        await _userManager.CreateAsync(user);
+
+                    }
+                    // add a login ( i.e insert a row for the user in AspNet )
+                    await _userManager.AddLoginAsync(user, info);
+                }
+            }
+            //var headers = Response.Headers.ToList();
             //var externa = new ExternalLoginInfo();
-            return Redirect("http://localhost:3000/users");
+            return Redirect($"http://localhost:3000/external-login?email={info.Principal.FindFirstValue(ClaimTypes.Email)}&providerKey={info.ProviderKey}&loginProvider={info.LoginProvider}");
         }
 
         [AllowAnonymous]

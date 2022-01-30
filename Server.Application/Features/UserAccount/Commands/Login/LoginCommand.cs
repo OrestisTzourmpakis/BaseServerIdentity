@@ -15,6 +15,8 @@ namespace Server.Application.Features.UserAccount.Commands.Login
     {
         public string Email { get; set; }
         public string Password { get; set; }
+        public string ProviderKey { get; set; }
+        public string LoginProvider { get; set; }
 
     }
     public class LoginCommandHandler : IRequestHandler<LoginCommand, BaseResponse>

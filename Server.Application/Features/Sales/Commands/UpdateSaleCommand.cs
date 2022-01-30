@@ -5,6 +5,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using AutoMapper;
 using MediatR;
+using Microsoft.AspNetCore.Http;
 using Server.Application.Contracts;
 using Server.Application.Responses;
 
@@ -18,6 +19,7 @@ namespace Server.Application.Features.Sales.Commands
         public string Image { get; set; }
         public DateTime DateStart { get; set; }
         public DateTime DateEnd { get; set; }
+        public IFormFile ImageFile { get; set; }
     }
 
     public class UpdateSaleCommandHandler : IRequestHandler<UpdateSaleCommand, BaseResponse>
