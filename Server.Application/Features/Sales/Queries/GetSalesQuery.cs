@@ -15,6 +15,7 @@ namespace Server.Application.Features.Sales.Queries
     public class GetSalesQuery : IRequest<BaseResponse>
     {
         public string Email { get; set; }
+        public int Id { get; set; }
     }
 
     public class GetSalesQueryHandler : IRequestHandler<GetSalesQuery, BaseResponse>
@@ -33,15 +34,23 @@ namespace Server.Application.Features.Sales.Queries
 
         public async Task<BaseResponse> Handle(GetSalesQuery request, CancellationToken cancellationToken)
         {
-            var user = await _userManager.FindByEmailAsync(request.Email);
-            var includeList = new List<Expression<Func<Company, object>>>() { c => c.Sales };
-            var result = await _unitOfWork.Companies.GetByIdAsync(c => c.ApplicationUserId == user.Id, includes: includeList);
-            var sales = new List<Domain.Models.Sales>();
+            List<Domain.Models.Sales> finalSales = new List<Domain.Models.Sales>();
             var finaluRL = _httpContextAccessorWrapper.GetUrl();
             finaluRL += "Images/";
-            List<Domain.Models.Sales> finalSales = new List<Domain.Models.Sales>();
-            if (result != null)
-                finalSales = result.Sales.Select(c => { c.Image = c.Image == null ? null : finaluRL + c.Image; return c; }).ToList();
+            if (!string.IsNullOrEmpty(request.Email))
+            {
+                var user = await _userManager.FindByEmailAsync(request.Email);
+                var includeList = new List<Expression<Func<Company, object>>>() { c => c.Sales };
+                var result = await _unitOfWork.Companies.GetByIdAsync(c => c.ApplicationUserId == user.Id, includes: includeList);
+                if (result != null)
+                    finalSales = result.Sales.Select(c => { c.Image = c.Image == null ? null : finaluRL + c.Image; return c; }).ToList();
+            }
+            else
+            {
+                // parta me to company id!!!
+                var resultTemp = await _unitOfWork.Sales.GetAsync(c => c.CompanyId == request.Id, disableTracking: true);
+                finalSales = resultTemp.Select(c => { c.Image = c.Image == null ? null : finaluRL + c.Image; return c; }).ToList();
+            }
             return new BaseResponse()
             {
                 data = finalSales

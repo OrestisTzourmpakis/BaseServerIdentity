@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Options;
 using Server.Application.Contracts;
+using Server.Infrastructure.Helper;
 using Server.Infrastructure.Options;
 
 namespace Server.Infrastructure.Mail
@@ -77,6 +78,32 @@ namespace Server.Infrastructure.Mail
             }
         }
 
+        public void SendEmailFromAdminVerificationLink(string to, string subject, string link, string password)
+        {
+            var fromAddress = new MailAddress(_mailOptions.FromEmailAddress, _mailOptions.DisplayName);
+            var toAddress = new MailAddress(to, "");
+            var smtp = new SmtpClient
+            {
+                Host = _mailOptions.Server,
+                Port = _mailOptions.Port,
+                EnableSsl = true,
+                DeliveryMethod = SmtpDeliveryMethod.Network,
+                Credentials = new NetworkCredential(fromAddress.Address, _mailOptions.FromPassword),
+                Timeout = 20000
+            };
+            //var templateLink = CreateHTMLMessage("EmailVerificationTemplate", link);
+            var templatePassword = DefaultPasswordSetUp("EmailVerificationTemplateDefaultPassword", link, password);
+            using (var message = new MailMessage(fromAddress, toAddress)
+            {
+                Subject = subject,
+                Body = templatePassword,
+                IsBodyHtml = true
+            })
+            {
+                smtp.Send(message);
+            }
+        }
+
         public void SendEmaiForgotPassowrdLink(string to, string subject, string link)
         {
             var fromAddress = new MailAddress(_mailOptions.FromEmailAddress, _mailOptions.DisplayName);
@@ -112,6 +139,17 @@ namespace Server.Infrastructure.Mail
             return fileContent;
         }
 
+
+        private string DefaultPasswordSetUp(string template, string link, string password)
+        {
+            var file = $"./Utilities/EmailTemplates/{template}.html";
+            var fileContent = File.ReadAllText(file);
+            var placeHolder = "verifyemaillink";
+            fileContent = fileContent.Replace(placeHolder, link);
+            string placeHolderPassword = "defaultPassword";
+            fileContent = fileContent.Replace(placeHolderPassword, password);
+            return fileContent;
+        }
 
     }
 }

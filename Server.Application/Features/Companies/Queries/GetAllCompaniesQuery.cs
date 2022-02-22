@@ -23,11 +23,13 @@ namespace Server.Application.Features.Companies.Queries
     {
         private readonly IUnitOfWork _unitOfWork;
         private readonly IMapper _mapper;
+        private readonly IHttpContextAccessorWrapper _httpContextAccessorWrapper;
 
-        public GetAllCompaniesQueryHandler(IUnitOfWork unitOfWork, IMapper mapper)
+        public GetAllCompaniesQueryHandler(IUnitOfWork unitOfWork, IMapper mapper, IHttpContextAccessorWrapper httpContextAccessorWrapper)
         {
             _unitOfWork = unitOfWork;
             _mapper = mapper;
+            _httpContextAccessorWrapper = httpContextAccessorWrapper;
         }
 
         public async Task<BaseResponse> Handle(GetAllCompaniesQuery request, CancellationToken cancellationToken)
@@ -39,6 +41,8 @@ namespace Server.Application.Features.Companies.Queries
             Type type = companies.GetType();
             Type listType = typeof(List<>).MakeGenericType(new[] { type });
             IList list = (IList)Activator.CreateInstance(listType);
+            var finalUrl = _httpContextAccessorWrapper.GetUrl() + "Images/";
+            mappedCompanies = mappedCompanies.Select(c => { c.Logo = c.Logo == null ? null : finalUrl + c.Logo; return c; }).ToList();
             return new BaseResponse()
             {
                 data = mappedCompanies

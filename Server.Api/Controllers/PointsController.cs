@@ -30,7 +30,7 @@ namespace Server.Api.Controllers
         }
 
 
-        [Authorize(Roles = nameof(UserRoles.Administrator))]
+        [Authorize(Roles = $"{nameof(UserRoles.Administrator)},{nameof(UserRoles.CompanyOwner)}")]
         [HttpPost]
         [Route("addPoints")]
         public async Task<IActionResult> AddPoints([FromBody] AddUserPointsCommand model)
@@ -38,7 +38,7 @@ namespace Server.Api.Controllers
             return Ok(await _mediator.Send(model));
         }
 
-        [Authorize(Roles = nameof(UserRoles.Administrator))]
+        [Authorize(Roles = $"{nameof(UserRoles.Administrator)},{nameof(UserRoles.CompanyOwner)}")]
         [HttpPost]
         [Route("getPoints")]
         public IActionResult GetPoints()
@@ -46,7 +46,7 @@ namespace Server.Api.Controllers
             return Ok("bhke boy");
         }
 
-        [Authorize(Roles = nameof(UserRoles.Administrator))]
+        [Authorize(Roles = $"{nameof(UserRoles.Administrator)},{nameof(UserRoles.CompanyOwner)}")]
         [HttpPut]
         [Route("setPoints")]
         public async Task<IActionResult> SetPoints([FromBody] UpdateUserPointsCommand model)
@@ -54,14 +54,14 @@ namespace Server.Api.Controllers
             return Ok(await _mediator.Send(model));
         }
 
-
+        [Authorize(Roles = $"{nameof(UserRoles.Administrator)},{nameof(UserRoles.CompanyOwner)}")]
         [HttpGet]
         [Route("getUserPointsPerCompany")]
-        public async Task<IActionResult> GetUserPointsPerCompany(string email)
+        public async Task<IActionResult> GetUserPointsPerCompany(string email, string ownerEmail)
         {
-            return Ok(await _mediator.Send(new GetUsersPointsPerCompanyQuery() { Email = email }));
+            return Ok(await _mediator.Send(new GetUsersPointsPerCompanyQuery() { Email = email, CompanyOwnerEmail = ownerEmail }));
         }
-
+        [Authorize(Roles = $"{nameof(UserRoles.Administrator)},{nameof(UserRoles.CompanyOwner)}")]
         [HttpGet]
         [Route("getUserPointsAllCompanies")]
         public async Task<IActionResult> GetUserPointsAllCompanies(string email)

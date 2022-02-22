@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using AutoMapper;
 using FluentValidation.Results;
 using MediatR;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Server.Application.Contracts;
 using Server.Application.Exceptions;
@@ -29,18 +30,21 @@ namespace Server.Application.Features.Companies.Commands
         public double EuroToPointsRatio { get; set; }
         public double PointsToEuroRatio { get; set; }
         public string ApplicationUserId { get; set; }
+        public IFormFile LogoFile { get; set; }
     }
     public class UpdateCompanyCommandHandler : IRequestHandler<UpdateCompanyCommand, BaseResponse>
     {
         private readonly IUnitOfWork _unitOfWork;
         private readonly IMapper _mapper;
         private readonly UserManager<ApplicationUser> _userManager;
+        private readonly IFileService _fileService;
 
-        public UpdateCompanyCommandHandler(IUnitOfWork unitOfWork, IMapper mapper, UserManager<ApplicationUser> userManager)
+        public UpdateCompanyCommandHandler(IUnitOfWork unitOfWork, IMapper mapper, UserManager<ApplicationUser> userManager, IFileService fileService)
         {
             _unitOfWork = unitOfWork;
             _mapper = mapper;
             _userManager = userManager;
+            _fileService = fileService;
         }
 
         public async Task<BaseResponse> Handle(UpdateCompanyCommand request, CancellationToken cancellationToken)
@@ -96,6 +100,14 @@ namespace Server.Application.Features.Companies.Commands
                     }
                 }
             }
+            else
+            {
+                request.ApplicationUserId = company.ApplicationUserId;
+            }
+            if (request.LogoFile == null)
+                request.Logo = company.Logo;
+            else
+                request.Logo = await _fileService.SaveImage(request.LogoFile, $"CompanyImage-{company.Id}-");
             // exists update it
             _mapper.Map(request, company);
             await _unitOfWork.Companies.UpdateAsync(company);

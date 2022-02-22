@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using AutoMapper;
 using FluentValidation.Results;
 using MediatR;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Server.Application.Contracts;
 using Server.Application.Exceptions;
@@ -28,6 +29,7 @@ namespace Server.Application.Features.Companies.Commands
         public string Email { get; set; }
         public double EuroToPointsRatio { get; set; }
         public double PointsToEuroRatio { get; set; }
+        public IFormFile LogoFile { get; set; }
     }
 
     public class AddCompanyCommandHandler : IRequestHandler<AddCompanyCommand, BaseResponse>
@@ -35,11 +37,14 @@ namespace Server.Application.Features.Companies.Commands
         private readonly IUnitOfWork _unitOfWork;
         private readonly IMapper _mapper;
         private readonly UserManager<ApplicationUser> _userManager;
-        public AddCompanyCommandHandler(IUnitOfWork unitOfWork, IMapper mapper, UserManager<ApplicationUser> userManager)
+        private readonly IFileService _fileService;
+
+        public AddCompanyCommandHandler(IUnitOfWork unitOfWork, IMapper mapper, UserManager<ApplicationUser> userManager, IFileService fileService)
         {
             _unitOfWork = unitOfWork;
             _mapper = mapper;
             _userManager = userManager;
+            _fileService = fileService;
         }
         public async Task<BaseResponse> Handle(AddCompanyCommand request, CancellationToken cancellationToken)
         {
@@ -64,6 +69,8 @@ namespace Server.Application.Features.Companies.Commands
                 var failure = new ValidationFailure("Id", $"User with email: {request.Email} is already registered to a company.");
                 throw new ValidationException(new List<ValidationFailure>() { failure });
             }
+            if (request.Logo != null && request.LogoFile != null)
+                request.Logo = await _fileService.SaveImage(request.LogoFile, $"CompanyImage-{user.UserName}-");
             request.ApplicationUserId = user.Id;
             var company = await _unitOfWork.Companies.AddAsync(_mapper.Map<Company>(request));
             await _unitOfWork.Save();

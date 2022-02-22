@@ -171,6 +171,9 @@ namespace Server.Infrastructure.Migrations
                         .IsConcurrencyToken()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<DateTime>("DateJoined")
+                        .HasColumnType("datetime2");
+
                     b.Property<string>("Email")
                         .HasMaxLength(256)
                         .HasColumnType("nvarchar(256)");
@@ -269,7 +272,7 @@ namespace Server.Infrastructure.Migrations
                         .IsUnique()
                         .HasFilter("[ApplicationUserId] IS NOT NULL");
 
-                    b.ToTable("Companies", (string)null);
+                    b.ToTable("Companies");
                 });
 
             modelBuilder.Entity("Server.Domain.Models.Points", b =>
@@ -283,11 +286,14 @@ namespace Server.Infrastructure.Migrations
                     b.Property<double>("Total")
                         .HasColumnType("float");
 
+                    b.Property<DateTime>("UserJoined")
+                        .HasColumnType("datetime2");
+
                     b.HasKey("ApplicationUserId", "CompanyId");
 
                     b.HasIndex("CompanyId");
 
-                    b.ToTable("Points", (string)null);
+                    b.ToTable("Points");
                 });
 
             modelBuilder.Entity("Server.Domain.Models.PointsHistory", b =>
@@ -308,13 +314,16 @@ namespace Server.Infrastructure.Migrations
                     b.Property<double>("Transaction")
                         .HasColumnType("float");
 
+                    b.Property<DateTime>("TransactionDate")
+                        .HasColumnType("datetime2");
+
                     b.HasKey("Id");
 
                     b.HasIndex("ApplicationUserId");
 
                     b.HasIndex("CompanyId");
 
-                    b.ToTable("PointsHistory", (string)null);
+                    b.ToTable("PointsHistory");
                 });
 
             modelBuilder.Entity("Server.Domain.Models.Sales", b =>
@@ -347,7 +356,7 @@ namespace Server.Infrastructure.Migrations
 
                     b.HasIndex("CompanyId");
 
-                    b.ToTable("Sales", (string)null);
+                    b.ToTable("Sales");
                 });
 
             modelBuilder.Entity("Server.Domain.Models.Store", b =>
@@ -365,11 +374,14 @@ namespace Server.Infrastructure.Migrations
                     b.Property<int>("CompanyId")
                         .HasColumnType("int");
 
+                    b.Property<DateTime>("Created")
+                        .HasColumnType("datetime2");
+
                     b.HasKey("Id");
 
                     b.HasIndex("CompanyId");
 
-                    b.ToTable("Stores", (string)null);
+                    b.ToTable("Stores");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
@@ -441,7 +453,7 @@ namespace Server.Infrastructure.Migrations
                         .IsRequired();
 
                     b.HasOne("Server.Domain.Models.Company", "Company")
-                        .WithMany()
+                        .WithMany("Points")
                         .HasForeignKey("CompanyId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -473,7 +485,7 @@ namespace Server.Infrastructure.Migrations
             modelBuilder.Entity("Server.Domain.Models.Sales", b =>
                 {
                     b.HasOne("Server.Domain.Models.Company", "Company")
-                        .WithMany()
+                        .WithMany("Sales")
                         .HasForeignKey("CompanyId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -501,6 +513,10 @@ namespace Server.Infrastructure.Migrations
 
             modelBuilder.Entity("Server.Domain.Models.Company", b =>
                 {
+                    b.Navigation("Points");
+
+                    b.Navigation("Sales");
+
                     b.Navigation("Stores");
                 });
 #pragma warning restore 612, 618

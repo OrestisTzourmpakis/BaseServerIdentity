@@ -48,7 +48,24 @@ namespace Server.Application.Features.UserAccount.Commands
         {
             var model = _mapper.Map<ResetPasswordModel>(request);
             var htmlView = new HtmlView(request.ViewData);
+            if (!request.ModelIsValid)
+            {
+
+                return htmlView.GetViewResult<ResetPasswordModel>(HtmlTemplates.ResetPasswordForm, model);
+            }
+            var user = await _userManager.FindByEmailAsync(model.Email);
+            if (user != null)
+            {
+                var result = await _userManager.ResetPasswordAsync(user, model.Token, model.Password);
+                if (result.Succeeded)
+                {
+
+                    return htmlView.GetViewResult<ResetPasswordModel>(HtmlTemplates.ResetPassSucceedView, model);
+                }
+
+            }
             return htmlView.GetViewResult<ResetPasswordModel>(HtmlTemplates.ResetPasswordForm, model);
+
         }
     }
 }

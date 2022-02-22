@@ -32,8 +32,16 @@ namespace Server.Application.Features.UserAccount.Queries
         {
             // get all the users by company!!
             var user = await _userManager.FindByEmailAsync(request.Email);
+            var company = await _unitOfWork.Companies.GetByIdAsync(c => c.ApplicationUserId == user.Id);
+            if (company == null)
+            {
+                return new BaseResponse
+                {
+                    data = new List<Company>()
+                };
+            }
             var includeList = new List<Expression<Func<Domain.Models.Points, object>>>() { c => c.ApplicationUser };
-            var result = await _unitOfWork.Points.GetAsync(c => c.ApplicationUserId == user.Id, includes: includeList);
+            var result = (await _unitOfWork.Points.GetAsync(c => c.CompanyId == company.Id, includes: includeList)).Select(c => c.ApplicationUser).ToList();
             return new BaseResponse()
             {
                 data = result

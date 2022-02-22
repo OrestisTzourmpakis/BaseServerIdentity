@@ -41,9 +41,10 @@ namespace Server.Api
             services.AddCors(o =>
             {
                 o.AddPolicy("AllowAll", builder =>
-                    builder.AllowAnyOrigin()
-                    .AllowAnyMethod()
-                    .AllowAnyHeader());
+                    builder.AllowAnyHeader()
+        .AllowAnyMethod()
+        .AllowCredentials()
+        .SetIsOriginAllowed((host) => true));
             });
             //         services.AddCors(options =>
             //   {

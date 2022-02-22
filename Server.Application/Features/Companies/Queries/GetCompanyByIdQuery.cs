@@ -21,11 +21,13 @@ namespace Server.Application.Features.Companies.Queries
     {
         private readonly IUnitOfWork _unitOfWork;
         private readonly UserManager<ApplicationUser> _userManager;
+        private readonly IHttpContextAccessorWrapper _httpContextAccessorWrapper;
 
-        public GetCompanyByIdQueryHandler(IUnitOfWork unitOfWork, UserManager<ApplicationUser> userManager)
+        public GetCompanyByIdQueryHandler(IUnitOfWork unitOfWork, UserManager<ApplicationUser> userManager, IHttpContextAccessorWrapper httpContextAccessorWrapper)
         {
             _unitOfWork = unitOfWork;
             _userManager = userManager;
+            _httpContextAccessorWrapper = httpContextAccessorWrapper;
         }
 
         public async Task<BaseResponse> Handle(GetCompanyByIdQuery request, CancellationToken cancellationToken)
@@ -37,6 +39,9 @@ namespace Server.Application.Features.Companies.Queries
                 var failure = new ValidationFailure("Id", $"User with email : {request.Email} does not have a company.");
                 throw new ValidationException(new List<ValidationFailure>() { failure });
             }
+            var finalUrl = _httpContextAccessorWrapper.GetUrl();
+            finalUrl += "Images/";
+            company.Logo = company.Logo == null ? null : finalUrl + company.Logo;
             return new BaseResponse() { data = company };
 
 

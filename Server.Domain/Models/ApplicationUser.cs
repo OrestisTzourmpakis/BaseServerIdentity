@@ -11,6 +11,7 @@ namespace Server.Domain.Models
 
         public ICollection<Points> Points { get; set; }
         public Company Company { get; set; }
+        public DateTime DateJoined { get; set; }
 
     }
 }

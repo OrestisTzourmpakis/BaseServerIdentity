@@ -5,6 +5,7 @@ using System.Linq;
 using System.Security.Claims;
 using System.Text;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
@@ -23,16 +24,19 @@ namespace Server.Infrastructure.Authentication
         private readonly JwtSettings _jwtSettings;
         private readonly IUnitOfWork _unitOfWork;
 
-        public AuthService(UserManager<ApplicationUser> userManager, SignInManager<ApplicationUser> signInManager, IUnitOfWork unitOfWork, IOptions<JwtSettings> jwtSettings)
+        private readonly IHttpContextAccessor _httpContextAccessor;
+        public AuthService(UserManager<ApplicationUser> userManager, SignInManager<ApplicationUser> signInManager, IUnitOfWork unitOfWork, IOptions<JwtSettings> jwtSettings, IHttpContextAccessor httpContextAccessor)
         {
             _userManager = userManager;
             _signInManager = signInManager;
             _jwtSettings = jwtSettings.Value;
             _unitOfWork = unitOfWork;
+            _httpContextAccessor = httpContextAccessor;
         }
 
         public async Task<AuthResponse> Login(AuthRequest request)
         {
+            var cookies = _httpContextAccessor.HttpContext.Request.Cookies.ToList();
             var user = await _userManager.FindByEmailAsync(request.Email);
             if (user == null)
                 throw new Exception($"User with {request.Email} not found.");
@@ -54,16 +58,23 @@ namespace Server.Infrastructure.Authentication
                 if (company != null) companyId = company.Id;
             }
             JwtSecurityToken jwtSecurityToken = await GenerateToken(user, roles);
+            var token = new JwtSecurityTokenHandler().WriteToken(jwtSecurityToken);
             AuthResponse response = new AuthResponse
             {
                 Id = user.Id,
-                Token = new JwtSecurityTokenHandler().WriteToken(jwtSecurityToken),
+                Token = token,
                 Email = user.Email,
                 UserName = user.UserName,
                 Roles = roles,
                 CompanyId = companyId
 
             };
+            _httpContextAccessor.HttpContext.Response.Cookies.Append("jwt", token, new CookieOptions
+            {
+                HttpOnly = true,
+                SameSite = SameSiteMode.None,
+                Secure = true
+            });
             return response;
 
 

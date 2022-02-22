@@ -4,12 +4,15 @@ using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
 using MediatR;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Server.Application.Features.Sales.Commands;
 using Server.Application.Features.Sales.Queries;
+using Server.Application.Utilities;
 
 namespace Server.Api.Controllers
 {
+    [Authorize(Roles = $"{nameof(UserRoles.Administrator)},{nameof(UserRoles.CompanyOwner)}")]
     [ApiController]
     [Route("api/[controller]")]
     public class SalesController : ControllerBase
@@ -25,10 +28,12 @@ namespace Server.Api.Controllers
 
         [HttpGet]
         [Route("getSales")]
-        public async Task<IActionResult> GetSalesUserEmail(string email)
+        public async Task<IActionResult> GetSalesUserEmail(string email, int id)
         {
-            return Ok(await _mediator.Send(new GetSalesQuery() { Email = email }));
+            return Ok(await _mediator.Send(new GetSalesQuery() { Email = email, Id = id }));
         }
+
+
 
         [HttpGet]
         [Route("getAllSales")]
@@ -39,7 +44,7 @@ namespace Server.Api.Controllers
 
         [HttpPut]
         [Route("updateSale")]
-        public async Task<IActionResult> GetUsersByCompany([FromBody] UpdateSaleCommand model)
+        public async Task<IActionResult> GetUsersByCompany([FromForm] UpdateSaleCommand model)
         {
             return Ok(await _mediator.Send(model));
         }

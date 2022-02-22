@@ -17,7 +17,7 @@ namespace Server.Application.Features.UserAccount.Commands
         public string Id { get; set; }
         public string Email { get; set; }
         public string UserName { get; set; }
-        public bool Owner { get; set; }
+        public bool? Owner { get; set; }
     }
 
     public class UpdateUserCommandHandler : IRequestHandler<UpdateUserCommand, Unit>
@@ -49,10 +49,11 @@ namespace Server.Application.Features.UserAccount.Commands
                 throw new ValidationException(result.Errors);
             }
             var isOwner = await _userManager.IsInRoleAsync(user, UserRoles.CompanyOwner.ToString());
+            if (request.Owner == null) return Unit.Value;
             if (request.Owner != isOwner)
             {
                 // check if the user is a company owner!!
-                if (request.Owner)
+                if (request.Owner == true)
                     await _userManager.AddToRoleAsync(user, UserRoles.CompanyOwner.ToString());
                 else
                 {

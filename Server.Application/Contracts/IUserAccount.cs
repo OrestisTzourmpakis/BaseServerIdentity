@@ -14,8 +14,10 @@ namespace Server.Application.Contracts
     {
         Task<bool> RegisterUser(RegisterCommand user);
         Task<bool> LoginUser(LoginCommand user);
+        Task<bool> RegisterUserFromAdmin(RegisterFromAdminCommand user);
         Task<bool> ConfirmEmail(string token, string email);
         Task ResetPassword(ResetPasswordCommand model);
         Task<string> GenerateResetPasswordToken(string email);
+        Task DeleteUser(string email);
     }
 }

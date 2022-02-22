@@ -33,7 +33,7 @@ namespace Server.Api.Controllers
         [Authorize(Roles = nameof(UserRoles.Administrator))]
         [HttpPost]
         [Route("addCompany")]
-        public async Task<IActionResult> AddCompany([FromBody] AddCompanyCommand company)
+        public async Task<IActionResult> AddCompany([FromForm] AddCompanyCommand company)
         {
 
             return Ok(await _mediator.Send(company));
@@ -65,6 +65,7 @@ namespace Server.Api.Controllers
         }
 
         [Authorize(Roles = nameof(UserRoles.Administrator))]
+        //[AllowAnonymous]
         [HttpDelete]
         [Route("deleteCompany")]
         public async Task<IActionResult> DeleteCompany(int id)
@@ -72,12 +73,29 @@ namespace Server.Api.Controllers
             return Ok(await _mediator.Send(new DeleteCompanyCommand() { Id = id }));
         }
 
+
+        [Authorize(Roles = $"{nameof(UserRoles.Administrator)},{nameof(UserRoles.CompanyOwner)}")]
+        [HttpGet]
+        [Route("getCompanyByEmail")]
+        public async Task<IActionResult> GetCompanyByEmail(string email)
+        {
+            return Ok(await _mediator.Send(new GetCompanyByEmailQuery { Email = email }));
+        }
+
         [Authorize(Roles = nameof(UserRoles.Administrator))]
+        //[AllowAnonymous]
         [HttpPut]
         [Route("updateCompany")]
-        public async Task<IActionResult> UpdateCompany([FromBody] UpdateCompanyCommand company)
+        public async Task<IActionResult> UpdateCompany([FromForm] UpdateCompanyCommand company)
         {
             return Ok(await _mediator.Send(company));
+        }
+        [AllowAnonymous]
+        [HttpGet]
+        [Route("GetAllCompaniesWithCount")]
+        public async Task<IActionResult> GetAllCompaniesWithCount()
+        {
+            return Ok(await _mediator.Send(new GetCompaniesWithCountQuery()));
         }
     }
 }

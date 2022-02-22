@@ -15,6 +15,7 @@ using Server.Application.Features.UserAccount.Commands.Register;
 using Server.Application.Features.UserAccount.Queries;
 using Server.Application.Models.CompanyModel;
 using Server.Application.Models.Identity;
+using Server.Application.Responses;
 using Server.Domain.Models;
 
 namespace Server.Application.Profiles
@@ -31,6 +32,7 @@ namespace Server.Application.Profiles
             CreateMap<LoginCommand, ApplicationUser>().ReverseMap();
             CreateMap<LoginCommand, AuthRequest>().ReverseMap();
             CreateMap<RegisterCommand, ApplicationUser>().ReverseMap();
+            CreateMap<RegisterFromAdminCommand, ApplicationUser>().ReverseMap();
             CreateMap<ResetPasswordCommand, ResetPasswordModel>().ReverseMap();
             CreateMap<ResetPasswordQuery, ResetPasswordModel>().ReverseMap();
             #endregion UserAccount
@@ -42,6 +44,7 @@ namespace Server.Application.Profiles
                 a => a.MapFrom(src => src.OwnerEmail)
                 )
                 .ReverseMap();
+            CreateMap<Company, CompaniesWithCountResponse>().ReverseMap();
             #endregion Companies
 
             #region Stores

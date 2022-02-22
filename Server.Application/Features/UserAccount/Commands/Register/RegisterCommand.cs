@@ -18,6 +18,7 @@ namespace Server.Application.Features.UserAccount.Commands.Register
         public string UserName { get; set; }
         public string Password { get; set; }
         public bool Owner { get; set; } = false;
+
     }
     public class RegisterCommandHandler : IRequestHandler<RegisterCommand, BaseResponse>
     {

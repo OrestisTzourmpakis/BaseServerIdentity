@@ -41,12 +41,51 @@ namespace Server.Infrastructure.Persistence
         // when we add a user in the table!!
         public override Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
         {
-            foreach (var entry in ChangeTracker.Entries<IdentityUser>())
+            foreach (var entry in ChangeTracker.Entries<ApplicationUser>())
             {
                 // has the email, username here!
                 // entry.Entity.UserName = entry.Entity.UserName + "aaa";
                 // entry.Entity.NormalizedUserName = entry.Entity.NormalizedUserName + "AAA";
 
+            }
+
+            foreach (var entry in ChangeTracker.Entries<PointsHistory>())
+            {
+                if (entry.State == EntityState.Added)
+                {
+                    entry.Entity.TransactionDate = DateTime.Now;
+                }
+            }
+
+            foreach (var entry in ChangeTracker.Entries<ApplicationUser>())
+            {
+                if (entry.State == EntityState.Added)
+                {
+                    entry.Entity.DateJoined = DateTime.Now;
+                }
+            }
+            foreach (var entry in ChangeTracker.Entries<Points>())
+            {
+                if (entry.State == EntityState.Added)
+                {
+                    entry.Entity.UserJoined = DateTime.Now;
+                }
+            }
+
+            foreach (var entry in ChangeTracker.Entries<Points>())
+            {
+                if (entry.State == EntityState.Added)
+                {
+                    entry.Entity.UserJoined = DateTime.Now;
+                }
+            }
+
+            foreach (var entry in ChangeTracker.Entries<Store>())
+            {
+                if (entry.State == EntityState.Added)
+                {
+                    entry.Entity.Created = DateTime.Now;
+                }
             }
             return base.SaveChangesAsync(cancellationToken);
         }

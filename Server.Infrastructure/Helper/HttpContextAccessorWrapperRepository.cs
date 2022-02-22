@@ -17,7 +17,6 @@ namespace Server.Infrastructure.Helper
         {
             _httpContextAccessor = httpContextAccessor;
             baseUrl = _httpContextAccessor.HttpContext.Request.Scheme + "://" + _httpContextAccessor.HttpContext.Request.Host.Value + "/";
-
         }
 
         public string ConstructUrl(string controllerAction, Dictionary<string, string> dict)

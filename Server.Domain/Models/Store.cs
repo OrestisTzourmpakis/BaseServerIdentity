@@ -11,6 +11,7 @@ namespace Server.Domain.Models
         public int Id { get; set; }
         [Required]
         public string Address { get; set; }
+        public DateTime Created { get; set; }
         [Required]
         public int CompanyId { get; set; }
 

@@ -19,6 +19,8 @@ using Microsoft.Extensions.Logging;
 using Server.Infrastructure.Mail;
 using Server.Infrastructure.Options;
 using Server.Infrastructure.Helper;
+using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Http;
 
 namespace Server.Infrastructure
 {
@@ -75,6 +77,14 @@ namespace Server.Infrastructure
                         ValidIssuer = configuration["JwtSettings:Issuer"],
                         ValidAudience = configuration["JwtSettings:Audience"],
                         IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(configuration["JwtSettings:Key"]))
+                    };
+                    o.Events = new JwtBearerEvents
+                    {
+                        OnMessageReceived = context =>
+                        {
+                            context.Token = context.Request.Cookies["jwt"];
+                            return Task.CompletedTask;
+                        }
                     };
                 }
             );

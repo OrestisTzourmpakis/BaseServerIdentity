@@ -7,6 +7,7 @@ using AutoMapper;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Cors;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Server.Application.Contracts;
@@ -24,7 +25,6 @@ using Server.Infrastructure.Persistence;
 namespace Server.Api.Controllers
 {
     [ApiController]
-    [EnableCors("AllowAll")]
     [Route("api/[controller]")]
     public class UserAccountController : Controller
     {
@@ -55,9 +55,23 @@ namespace Server.Api.Controllers
         }
 
         [HttpPost]
+        [Route("registerfromadmin")]
+        public async Task<IActionResult> RegisterFromAdmin([FromBody] RegisterFromAdminCommand user)
+        {
+            return Ok(await _mediator.Send(user));
+        }
+
+
+
+
+        [HttpPost]
         [Route("login")]
         public async Task<IActionResult> Login([FromBody] LoginCommand user)
         {
+            Response.Cookies.Append("jwtaa", "asdfas", new CookieOptions
+            {
+                HttpOnly = true
+            });
             return Ok(await _authService.Login(_mapper.Map<AuthRequest>(user)));
         }
 
@@ -66,6 +80,10 @@ namespace Server.Api.Controllers
         [Route("testAdmin")]
         public IActionResult Login()
         {
+            Response.Cookies.Append("jwt", "asdfas", new CookieOptions
+            {
+                HttpOnly = true
+            });
             return Ok("bhke boy");
         }
 
@@ -84,6 +102,7 @@ namespace Server.Api.Controllers
             return Ok("bhke boy");
         }
 
+        [Authorize(Roles = $"{nameof(UserRoles.Administrator)},{nameof(UserRoles.CompanyOwner)}")]
         [HttpGet]
         [Route("getUsersByCompany")]
         public async Task<IActionResult> GetUsersByCompany(string email)
@@ -91,6 +110,7 @@ namespace Server.Api.Controllers
             return Ok(await _mediator.Send(new GetAllUsersByCompanyQuery() { Email = email }));
         }
 
+        [Authorize(Roles = $"{nameof(UserRoles.Administrator)}")]
         [HttpGet]
         [Route("getAllUsers")]
         public async Task<IActionResult> GetAllUsers()
@@ -242,12 +262,27 @@ namespace Server.Api.Controllers
             return Ok(await _mediator.Send(new CheckUserRoleQuery() { Email = email }));
         }
 
-        [AllowAnonymous]
+        [Authorize(Roles = $"{nameof(UserRoles.Administrator)},{nameof(UserRoles.CompanyOwner)}")]
         [HttpPost]
         [Route("updateUser")]
         public async Task<IActionResult> UpdateUser([FromBody] UpdateUserCommand model)
         {
             return Ok(await _mediator.Send(model));
+        }
+        [Authorize(Roles = $"{nameof(UserRoles.Administrator)}")]
+        [HttpDelete]
+        [Route("deleteUser")]
+        public async Task<IActionResult> DeleteUser(string email)
+        {
+            return Ok(await _mediator.Send(new DeleteUserCommand { Email = email }));
+        }
+
+        [Authorize(Roles = $"{nameof(UserRoles.Administrator)},{nameof(UserRoles.CompanyOwner)}")]
+        [HttpGet]
+        [Route("getUser")]
+        public async Task<IActionResult> GetUser(string email)
+        {
+            return Ok(await _mediator.Send(new GetUserQuery { Email = email }));
         }
 
     }
