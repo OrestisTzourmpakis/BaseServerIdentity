@@ -39,5 +39,26 @@ namespace Server.Api.Controllers
         {
             return Ok(await _mediator.Send(model));
         }
+
+        [Route("getLast6Months")]
+        [HttpPost]
+        public async Task<IActionResult> GetLast6Months([FromBody] GetLast6MonthsPointsQuery model)
+        {
+            return Ok(await _mediator.Send(model));
+        }
+
+        [Route("getTotalEarnedAndRedeemPoint")]
+        [HttpPost]
+        public async Task<IActionResult> GetTotalEarnedAndRedeemPoint([FromBody] GetTotalEarnedAndRedeemPointsQuery model)
+        {
+            return Ok(await _mediator.Send(model));
+        }
+
+        [Route("getTop30Users")]
+        [HttpPost]
+        public async Task<IActionResult> GetTop30Users([FromBody] GetTop30UsersQuery model)
+        {
+            return Ok(await _mediator.Send(model));
+        }
     }
 }

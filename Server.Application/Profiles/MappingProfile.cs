@@ -56,6 +56,15 @@ namespace Server.Application.Profiles
             CreateMap<AddSaleCommand, Sales>().ReverseMap();
             CreateMap<UpdateSaleCommand, Sales>().ReverseMap();
             #endregion Sales
+            #region Points
+            CreateMap<PointsUserResponse, Points>()
+                .ForPath(dest => dest.ApplicationUser.UserName,
+                a => a.MapFrom(src => src.Username))
+                .ForPath(dest => dest.ApplicationUser.Email,
+                a => a.MapFrom(src => src.Email))
+                .ForMember(dest => dest.UserJoined, opt => opt.MapFrom(src => src.DateJoined)).ReverseMap();
+
+            #endregion Points
         }
     }
 }

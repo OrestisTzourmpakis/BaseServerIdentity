@@ -4,6 +4,7 @@ using System.Linq;
 using System.Linq.Expressions;
 using System.Threading;
 using System.Threading.Tasks;
+using AutoMapper;
 using MediatR;
 using Microsoft.AspNetCore.Identity;
 using Server.Application.Contracts;
@@ -21,15 +22,18 @@ namespace Server.Application.Features.Statistics.Query
     {
         private IUnitOfWork _unitOfWork;
         private UserManager<ApplicationUser> _userManager;
-        public GetTop30UsersQueryHandler(IUnitOfWork unitOfWork, UserManager<ApplicationUser> userManager)
+        private IMapper _mapper;
+        public GetTop30UsersQueryHandler(IUnitOfWork unitOfWork, UserManager<ApplicationUser> userManager, IMapper mapper)
         {
             _unitOfWork = unitOfWork;
             _userManager = userManager;
+            _mapper = mapper;
         }
 
         public async Task<BaseResponse> Handle(GetTop30UsersQuery request, CancellationToken cancellationToken)
         {
             IEnumerable<Server.Domain.Models.Points> final = default(IEnumerable<Server.Domain.Models.Points>);
+            List<PointsUserResponse> response = default(List<PointsUserResponse>);
             if (!string.IsNullOrEmpty(request.CompanyOwnerEmail))
             {
                 var user = await _userManager.FindByEmailAsync(request.CompanyOwnerEmail);
@@ -38,11 +42,16 @@ namespace Server.Application.Features.Statistics.Query
                 includeList.Add(c => c.ApplicationUser);
                 var result = await _unitOfWork.Points.GetAsync(c => c.CompanyId == company.Id, orderBy: c => c.OrderByDescending(a => a.Total), includes: includeList);
                 final = result.Take(30);
+                response = _mapper.Map<List<PointsUserResponse>>(final);
+            }
+            else
+            {
+                // most active users !!
             }
 
             return new BaseResponse
             {
-                data = final
+                data = response
             };
         }
     }
