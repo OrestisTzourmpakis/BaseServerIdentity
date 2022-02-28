@@ -8,7 +8,7 @@ namespace Server.Application.Contracts
 {
     public interface IAuthService
     {
-        Task<AuthResponse> Login(AuthRequest request);
+        Task<AuthResponse> Login(AuthRequest request, bool fromAdmin = false);
         Task<RegistrationResponse> Register(RegistrationRequest request);
     }
 }

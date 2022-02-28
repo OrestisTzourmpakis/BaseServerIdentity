@@ -27,6 +27,7 @@ namespace Server.Infrastructure.Repositories
             var result = await _context.Companies.Include(a => a.Stores).Include(a => a.Points).Include(a => a.Sales).Select(a =>
             new CompaniesWithCountResponse
             {
+                Id = a.Id,
                 Name = a.Name,
                 ApplicationUserId = a.ApplicationUserId,
                 Logo = _httpContextAccessorWrapper.GetUrl() + "Images/" + a.Logo,
@@ -36,7 +37,7 @@ namespace Server.Infrastructure.Repositories
                 Instagram = a.Instagram,
                 EuroToPointsRatio = a.EuroToPointsRatio,
                 PointsToEuroRatio = a.PointsToEuroRatio,
-                CompanySalesCount = a.Sales.Count,
+                CompanySalesCount = a.Sales.Where(c => c.DateEnd > DateTime.Now).Count(),
                 CompanyStoresCount = a.Stores.Count,
                 CompanyUsersCount = a.Points.Count
             }

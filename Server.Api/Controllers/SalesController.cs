@@ -12,7 +12,8 @@ using Server.Application.Utilities;
 
 namespace Server.Api.Controllers
 {
-    [Authorize(Roles = $"{nameof(UserRoles.Administrator)},{nameof(UserRoles.CompanyOwner)}")]
+    //[Authorize(Roles = $"{nameof(UserRoles.Administrator)},{nameof(UserRoles.CompanyOwner)}")]
+    [Authorize]
     [ApiController]
     [Route("api/[controller]")]
     public class SalesController : ControllerBase
@@ -34,6 +35,13 @@ namespace Server.Api.Controllers
         }
 
 
+        [HttpGet]
+        [Route("getActiveSalesByCompanyId")]
+        public async Task<IActionResult> GetActiveSalesByCompanyId(int id)
+        {
+            return Ok(await _mediator.Send(new GetActiveSalesByCompanyIdQuery { Id = id }));
+        }
+
 
         [HttpGet]
         [Route("getAllSales")]
@@ -41,21 +49,21 @@ namespace Server.Api.Controllers
         {
             return Ok(await _mediator.Send(new GetAllSalesQuery()));
         }
-
+        [Authorize(Roles = $"{nameof(UserRoles.Administrator)},{nameof(UserRoles.CompanyOwner)}")]
         [HttpPut]
         [Route("updateSale")]
         public async Task<IActionResult> GetUsersByCompany([FromForm] UpdateSaleCommand model)
         {
             return Ok(await _mediator.Send(model));
         }
-
+        [Authorize(Roles = $"{nameof(UserRoles.Administrator)},{nameof(UserRoles.CompanyOwner)}")]
         [HttpPost]
         [Route("addSale")]
         public async Task<IActionResult> AddSale([FromForm] AddSaleCommand model)
         {
             return Ok(await _mediator.Send(model));
         }
-
+        [Authorize(Roles = $"{nameof(UserRoles.Administrator)},{nameof(UserRoles.CompanyOwner)}")]
         [HttpDelete]
         [Route("deleteSale")]
         public async Task<IActionResult> GetUsersByCompany(int id)

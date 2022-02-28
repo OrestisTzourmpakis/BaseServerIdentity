@@ -65,13 +65,17 @@ namespace Server.Api.Controllers
 
 
         [HttpPost]
-        [Route("login")]
-        public async Task<IActionResult> Login([FromBody] LoginCommand user)
+        [Route("loginAdmin")]
+        public async Task<IActionResult> LoginAdmin([FromBody] LoginCommand user)
         {
-            Response.Cookies.Append("jwtaa", "asdfas", new CookieOptions
-            {
-                HttpOnly = true
-            });
+            return Ok(await _authService.Login(_mapper.Map<AuthRequest>(user), fromAdmin: true));
+        }
+
+
+        [HttpPost]
+        [Route("loginWebApp")]
+        public async Task<IActionResult> LoginWebApp([FromBody] LoginCommand user)
+        {
             return Ok(await _authService.Login(_mapper.Map<AuthRequest>(user)));
         }
 
@@ -203,7 +207,6 @@ namespace Server.Api.Controllers
 
         [AllowAnonymous]
         [HttpGet]
-
         [Route("externalLogin")]
         public async Task<IActionResult> ExternalLogin(string returnUrl = null, string remoteError = null)
         {
@@ -283,6 +286,23 @@ namespace Server.Api.Controllers
         public async Task<IActionResult> GetUser(string email)
         {
             return Ok(await _mediator.Send(new GetUserQuery { Email = email }));
+        }
+
+        [Authorize]
+        [HttpPost]
+        [Route("authenticateUser")]
+        public async Task<IActionResult> AuthenticateUser()
+        {
+            return Ok(await _userAccount.AuthenticateUser());
+        }
+
+        [Authorize]
+        [HttpPost]
+        [Route("logout")]
+        public async Task<IActionResult> LogOut()
+        {
+            await _userAccount.Logout();
+            return Ok("user logged out!");
         }
 
     }

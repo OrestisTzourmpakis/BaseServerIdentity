@@ -14,7 +14,8 @@ using Server.Infrastructure.Persistence;
 
 namespace Server.Api.Controllers
 {
-    [Authorize(Roles = $"{nameof(UserRoles.Administrator)},{nameof(UserRoles.CompanyOwner)}")]
+    //[Authorize(Roles = $"{nameof(UserRoles.Administrator)},{nameof(UserRoles.CompanyOwner)}")]
+    [Authorize]
     [ApiController]
     [Route("api/[controller]")]
     public class StoresController : ControllerBase
@@ -50,6 +51,13 @@ namespace Server.Api.Controllers
         public async Task<IActionResult> GetStores(string email = "", int? id = null)
         {
             return Ok(await _mediator.Send(new GetStoreByCompanyQuery() { Email = email, CompanyId = id }));
+        }
+
+        [HttpGet]
+        [Route("getStoresByCompanyId")]
+        public async Task<IActionResult> GetStoresByCompanyId(int id)
+        {
+            return Ok(await _mediator.Send(new GetStoresByCompanyIdQuery { Id = id }));
         }
 
         //[Authorize(Roles = nameof(UserRoles.Administrator))]

@@ -15,7 +15,7 @@ namespace Server.Application.Features.Companies.Queries
 {
     public class GetCompanyByIdQuery : IRequest<BaseResponse>
     {
-        public string Email { get; set; }
+        public int Id { get; set; }
     }
     public class GetCompanyByIdQueryHandler : IRequestHandler<GetCompanyByIdQuery, BaseResponse>
     {
@@ -32,11 +32,10 @@ namespace Server.Application.Features.Companies.Queries
 
         public async Task<BaseResponse> Handle(GetCompanyByIdQuery request, CancellationToken cancellationToken)
         {
-            var user = await _userManager.FindByEmailAsync(request.Email);
-            var company = await _unitOfWork.Companies.GetByIdAsync(c => c.ApplicationUserId == user.Id);
+            var company = await _unitOfWork.Companies.GetByIdAsync(c => c.Id == request.Id);
             if (company == null)
             {
-                var failure = new ValidationFailure("Id", $"User with email : {request.Email} does not have a company.");
+                var failure = new ValidationFailure("Id", $"Company was not found.");
                 throw new ValidationException(new List<ValidationFailure>() { failure });
             }
             var finalUrl = _httpContextAccessorWrapper.GetUrl();

@@ -7,6 +7,7 @@ using Server.Application.DTO.Register;
 using Server.Application.Features.UserAccount.Commands;
 using Server.Application.Features.UserAccount.Commands.Login;
 using Server.Application.Features.UserAccount.Commands.Register;
+using Server.Application.Models.Identity;
 
 namespace Server.Application.Contracts
 {
@@ -19,5 +20,7 @@ namespace Server.Application.Contracts
         Task ResetPassword(ResetPasswordCommand model);
         Task<string> GenerateResetPasswordToken(string email);
         Task DeleteUser(string email);
+        Task<AuthResponse> AuthenticateUser();
+        Task Logout();
     }
 }

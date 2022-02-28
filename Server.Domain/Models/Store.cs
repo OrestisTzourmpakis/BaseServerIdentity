@@ -11,6 +11,10 @@ namespace Server.Domain.Models
         public int Id { get; set; }
         [Required]
         public string Address { get; set; }
+        public double Latitude { get; set; }
+        public double Longitude { get; set; }
+        public string Telephone { get; set; }
+
         public DateTime Created { get; set; }
         [Required]
         public int CompanyId { get; set; }

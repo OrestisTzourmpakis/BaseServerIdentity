@@ -34,7 +34,7 @@ namespace Server.Infrastructure.Authentication
             _httpContextAccessor = httpContextAccessor;
         }
 
-        public async Task<AuthResponse> Login(AuthRequest request)
+        public async Task<AuthResponse> Login(AuthRequest request, bool fromAdmin = false)
         {
             var cookies = _httpContextAccessor.HttpContext.Request.Cookies.ToList();
             var user = await _userManager.FindByEmailAsync(request.Email);
@@ -69,12 +69,33 @@ namespace Server.Infrastructure.Authentication
                 CompanyId = companyId
 
             };
-            _httpContextAccessor.HttpContext.Response.Cookies.Append("jwt", token, new CookieOptions
+            if (fromAdmin)
             {
-                HttpOnly = true,
-                SameSite = SameSiteMode.None,
-                Secure = true
-            });
+                // check the roles if he is company owner or admin
+                if (roles.Contains(UserRoles.CompanyOwner.ToString()) || roles.Contains(UserRoles.Administrator.ToString()))
+                {
+                    _httpContextAccessor.HttpContext.Response.Cookies.Append("jwt", token, new CookieOptions
+                    {
+                        HttpOnly = true,
+                        SameSite = SameSiteMode.None,
+                        Secure = true
+                    });
+                }
+            }
+            else
+            {
+                // he is from the webapp
+                if (!roles.Contains(UserRoles.CompanyOwner.ToString()) && !roles.Contains(UserRoles.Administrator.ToString()))
+                {
+                    _httpContextAccessor.HttpContext.Response.Cookies.Append("jwt", token, new CookieOptions
+                    {
+                        HttpOnly = true,
+                        SameSite = SameSiteMode.None,
+                        Secure = true
+                    });
+                }
+
+            }
             return response;
 
 
@@ -96,8 +117,7 @@ namespace Server.Infrastructure.Authentication
             {
                 new Claim(JwtRegisteredClaimNames.Sub, user.UserName),
                 new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
-                new Claim(JwtRegisteredClaimNames.Email, user.Email),
-                new Claim("uid", user.UserName),
+                new Claim("uid", user.Id),
             }
             .Union(userClaims)
             .Union(rolesClaims);
@@ -109,7 +129,7 @@ namespace Server.Infrastructure.Authentication
                 issuer: _jwtSettings.Issuer,
                 audience: _jwtSettings.Audience,
                 claims: claims,
-                expires: DateTime.UtcNow.AddMinutes(_jwtSettings.DurationInMinutes),
+                expires: DateTime.UtcNow.AddMonths(2),
                 signingCredentials: signingCredentials
 
             );

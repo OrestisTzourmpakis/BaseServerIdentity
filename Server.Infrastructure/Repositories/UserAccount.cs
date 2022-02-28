@@ -18,6 +18,7 @@ using Server.Application.Features.UserAccount.Commands;
 using System.Web;
 using Server.Application.Utilities;
 using Server.Infrastructure.Helper;
+using Server.Application.Models.Identity;
 
 namespace Server.Infrastructure.Repositories
 {
@@ -154,6 +155,39 @@ namespace Server.Infrastructure.Repositories
             var confirmationLink = _httpContextAccessorWrapper.ConstructUrl("api/useraccount/verifyemail", dict);
             _emailSender.SendEmailFromAdminVerificationLink(mappedUser.Email, "Email verification", confirmationLink, user.Password);
             return true;
+        }
+
+        public async Task<AuthResponse> AuthenticateUser()
+        {
+            var userId = _httpContextAccessorWrapper.GetHttpContext().HttpContext.User.FindFirst("uid").Value;
+            var user = await _userManager.FindByIdAsync(userId);
+            var roles = await _userManager.GetRolesAsync(user);
+            int? companyId = null;
+            if (roles.Contains(UserRoles.CompanyOwner.ToString()))
+            {
+                var company = await _unitOfWork.Companies.GetByIdAsync(c => c.ApplicationUserId == user.Id);
+                if (company != null) companyId = company.Id;
+            }
+            return new AuthResponse
+            {
+                Id = userId,
+                Email = user.Email,
+                UserName = user.UserName,
+                Roles = roles,
+                CompanyId = companyId
+            };
+        }
+
+        public Task Logout()
+        {
+            _httpContextAccessorWrapper.GetHttpContext().HttpContext.Response.Cookies.Delete("jwt", new CookieOptions
+            {
+                HttpOnly = true,
+                SameSite = SameSiteMode.None,
+                Secure = true
+            });
+
+            return Task.CompletedTask;
         }
     }
 }

@@ -48,12 +48,12 @@ namespace Server.Api.Controllers
             return Ok(await _mediator.Send(new GetAllCompaniesQuery()));
         }
 
-        [Authorize(Roles = nameof(UserRoles.Administrator))]
+        [Authorize]
         [HttpGet]
         [Route("getCompanyById")]
-        public async Task<IActionResult> GetCompanyById(string email)
+        public async Task<IActionResult> GetCompanyById(int id)
         {
-            return Ok(await _mediator.Send(new GetCompanyByIdQuery() { Email = email }));
+            return Ok(await _mediator.Send(new GetCompanyByIdQuery() { Id = id }));
         }
 
         [Authorize(Roles = $"{nameof(UserRoles.Administrator)},{nameof(UserRoles.CompanyOwner)}")]
@@ -82,7 +82,7 @@ namespace Server.Api.Controllers
             return Ok(await _mediator.Send(new GetCompanyByEmailQuery { Email = email }));
         }
 
-        [Authorize(Roles = nameof(UserRoles.Administrator))]
+        [Authorize(Roles = $"{nameof(UserRoles.Administrator)},{nameof(UserRoles.CompanyOwner)}")]
         //[AllowAnonymous]
         [HttpPut]
         [Route("updateCompany")]

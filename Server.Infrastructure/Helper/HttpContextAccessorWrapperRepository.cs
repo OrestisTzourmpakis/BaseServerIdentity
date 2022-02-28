@@ -38,6 +38,11 @@ namespace Server.Infrastructure.Helper
             return finalUrl;
         }
 
+        public IHttpContextAccessor GetHttpContext()
+        {
+            return _httpContextAccessor;
+        }
+
         public string GetUrl()
         {
             return baseUrl;
