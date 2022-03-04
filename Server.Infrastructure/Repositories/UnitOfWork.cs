@@ -12,7 +12,7 @@ namespace Server.Infrastructure.Repositories
     {
         private readonly ServerDbContext _context;
         private readonly IHttpContextAccessorWrapper _httpContextAccessorWrapper;
-        public IGenericRepository<Points> Points => _points ??= new GenericRepository<Points>(_context);
+        public IPointsRepository Points => _points ??= new PointsRepository(_context, _httpContextAccessorWrapper);
 
         public ICompanyRepository Companies => _companies ??= new CompanyRepository(_context, _httpContextAccessorWrapper);
 
@@ -22,7 +22,7 @@ namespace Server.Infrastructure.Repositories
         public IGenericRepository<ApplicationUserCompany> UserCompanies => _userCompanies ??= new GenericRepository<ApplicationUserCompany>(_context);
         public IGenericRepository<Sales> Sales => _sales ??= new GenericRepository<Sales>(_context);
 
-        private IGenericRepository<Points> _points;
+        private PointsRepository _points;
         private ICompanyRepository _companies;
         private IGenericRepository<Store> _stores;
         private IGenericRepository<ApplicationUser> _users;

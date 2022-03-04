@@ -10,7 +10,7 @@ namespace Server.Application.Contracts
     {
 
         // points , pointsHistory, stores,
-        IGenericRepository<Points> Points { get; }
+        IPointsRepository Points { get; }
         ICompanyRepository Companies { get; }
         IGenericRepository<Store> Stores { get; }
         IGenericRepository<ApplicationUser> Users { get; }

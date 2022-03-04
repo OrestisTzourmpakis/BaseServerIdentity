@@ -16,7 +16,7 @@ namespace Server.Application.Features.Stores.Commands
         public string Address { get; set; }
         public double Latitude { get; set; }
         public double Longitude { get; set; }
-        public string MyProperty { get; set; }
+        public string Telephone { get; set; }
     }
     public class UpdateStoreCommandHandler : IRequestHandler<UpdateStoreCommand, BaseResponse>
     {

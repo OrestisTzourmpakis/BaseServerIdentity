@@ -8,6 +8,7 @@ using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Http.Extensions;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Server.Application.Contracts;
@@ -31,17 +32,15 @@ namespace Server.Api.Controllers
         private readonly IMediator _mediator;
         private readonly IAuthService _authService;
         private readonly IMapper _mapper;
-        private readonly IEmailSender _email;
         private readonly IUserAccount _userAccount;
         private readonly SignInManager<ApplicationUser> _signInManager;
         private readonly UserManager<ApplicationUser> _userManager;
 
-        public UserAccountController(IMediator mediator, IAuthService authService, IMapper mapper, IEmailSender email, IUserAccount userAccount, SignInManager<ApplicationUser> signInManager, UserManager<ApplicationUser> userManager)
+        public UserAccountController(IMediator mediator, IAuthService authService, IMapper mapper, IUserAccount userAccount, SignInManager<ApplicationUser> signInManager, UserManager<ApplicationUser> userManager)
         {
             _mediator = mediator;
             _authService = authService;
             _mapper = mapper;
-            _email = email;
             _userAccount = userAccount;
             _signInManager = signInManager;
             _userManager = userManager;
@@ -91,7 +90,7 @@ namespace Server.Api.Controllers
             return Ok("bhke boy");
         }
 
-        [Authorize(Roles = $"{nameof(UserRoles.Administrator)},{nameof(UserRoles.CompanyOwner)}")]
+        [Authorize]
         [HttpGet]
         [Route("updateUser")]
         public IActionResult AddUser()
@@ -197,18 +196,19 @@ namespace Server.Api.Controllers
         [AllowAnonymous]
         [HttpGet]
         [Route("googleLogin")]
-        public async Task<IActionResult> GoogleLogin()
+        public async Task<IActionResult> GoogleLogin([FromQuery] string viewUrl)
         {
             // get the request headers
+            var con = HttpContext;
             var headers = Request.Headers.ToList();
             // Response.Headers.AccessControlAllowOrigin = "*";
-            return await _mediator.Send(new GoogleLoginCommand());
+            return await _mediator.Send(new GoogleLoginCommand { ViewUrl = viewUrl });
         }
 
         [AllowAnonymous]
         [HttpGet]
         [Route("externalLogin")]
-        public async Task<IActionResult> ExternalLogin(string returnUrl = null, string remoteError = null)
+        public async Task<IActionResult> ExternalLogin(string viewUrl, string returnUrl = null, string remoteError = null)
         {
             returnUrl = returnUrl ?? Url.Content("~/");
             if (remoteError != null)
@@ -254,7 +254,7 @@ namespace Server.Api.Controllers
             }
             //var headers = Response.Headers.ToList();
             //var externa = new ExternalLoginInfo();
-            return Redirect($"http://localhost:3000/external-login?email={info.Principal.FindFirstValue(ClaimTypes.Email)}&providerKey={info.ProviderKey}&loginProvider={info.LoginProvider}");
+            return Redirect($"{viewUrl}/external-login?email={info.Principal.FindFirstValue(ClaimTypes.Email)}&providerKey={info.ProviderKey}&loginProvider={info.LoginProvider}");
         }
 
         [AllowAnonymous]
@@ -265,7 +265,7 @@ namespace Server.Api.Controllers
             return Ok(await _mediator.Send(new CheckUserRoleQuery() { Email = email }));
         }
 
-        [Authorize(Roles = $"{nameof(UserRoles.Administrator)},{nameof(UserRoles.CompanyOwner)}")]
+        [Authorize]
         [HttpPost]
         [Route("updateUser")]
         public async Task<IActionResult> UpdateUser([FromBody] UpdateUserCommand model)
@@ -303,6 +303,14 @@ namespace Server.Api.Controllers
         {
             await _userAccount.Logout();
             return Ok("user logged out!");
+        }
+
+        [Authorize]
+        [HttpPost]
+        [Route("sendEmail")]
+        public async Task<IActionResult> SendEmail([FromBody] SendEmailCommand model)
+        {
+            return Ok(await _mediator.Send(model));
         }
 
     }

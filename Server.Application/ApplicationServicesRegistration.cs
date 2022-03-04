@@ -6,13 +6,14 @@ using System.Threading.Tasks;
 using MediatR;
 using FluentValidation;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Configuration;
 
 namespace Server.Application
 {
     public static class ApplicationServicesRegistration
     {
 
-        public static IServiceCollection ConfigureApplicationServices(this IServiceCollection services)
+        public static IServiceCollection ConfigureApplicationServices(this IServiceCollection services, IConfiguration configuration)
         {
             services.AddAutoMapper(Assembly.GetExecutingAssembly());
             // services.AddValidatorsFromAssembly(Assembly.GetExecutingAssembly());
@@ -21,8 +22,8 @@ namespace Server.Application
             services.AddAuthentication()
                 .AddGoogle(options =>
                 {
-                    options.ClientId = "715533597070-a5oamiocsjaheqnvirc55g1j14avef47.apps.googleusercontent.com";
-                    options.ClientSecret = "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";
+                    options.ClientId = configuration["GoogleApi:ClientId"];
+                    options.ClientSecret = configuration["GoogleApi:ClientSecret"];
                 });
             return services;
         }

@@ -47,6 +47,7 @@ namespace Server.Application.Features.Statistics.Query
             else
             {
                 // most active users !!
+                response = await _unitOfWork.Points.GetTotalUsersPoints();
             }
 
             return new BaseResponse

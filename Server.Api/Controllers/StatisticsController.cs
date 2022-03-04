@@ -60,5 +60,12 @@ namespace Server.Api.Controllers
         {
             return Ok(await _mediator.Send(model));
         }
+
+        [Route("getTotalCompanies")]
+        [HttpGet]
+        public async Task<IActionResult> GetTotalCompanies()
+        {
+            return Ok(await _mediator.Send(new GetTotalCompaniesQuery()));
+        }
     }
 }

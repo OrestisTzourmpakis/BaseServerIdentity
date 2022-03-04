@@ -19,6 +19,7 @@ using System.Web;
 using Server.Application.Utilities;
 using Server.Infrastructure.Helper;
 using Server.Application.Models.Identity;
+using FluentValidation.Results;
 
 namespace Server.Infrastructure.Repositories
 {
@@ -43,8 +44,17 @@ namespace Server.Infrastructure.Repositories
 
         public async Task<bool> LoginUser(LoginCommand user)
         {
-            await _signInManager.SignInAsync(_mapper.Map<ApplicationUser>(user), true);
-            return true;
+            try
+            {
+
+                await _signInManager.SignInAsync(_mapper.Map<ApplicationUser>(user), true);
+                return true;
+            }
+            catch (Exception ex)
+            {
+                var failure = new ValidationFailure("User", "Incorrenct email or passsword.");
+                throw new ValidationException(new List<ValidationFailure>() { failure });
+            }
         }
         public async Task<bool> RegisterUser(RegisterCommand user)
         {

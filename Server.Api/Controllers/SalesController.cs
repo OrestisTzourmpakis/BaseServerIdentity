@@ -42,6 +42,12 @@ namespace Server.Api.Controllers
             return Ok(await _mediator.Send(new GetActiveSalesByCompanyIdQuery { Id = id }));
         }
 
+        [HttpGet]
+        [Route("getAllActiveSales")]
+        public async Task<IActionResult> GetAllActiveSales()
+        {
+            return Ok(await _mediator.Send(new GetAllActiveSalesQuery()));
+        }
 
         [HttpGet]
         [Route("getAllSales")]

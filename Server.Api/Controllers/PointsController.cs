@@ -69,6 +69,17 @@ namespace Server.Api.Controllers
             return Ok(await _mediator.Send(new GetUserPointsAllCompaniesQuery() { Email = email }));
         }
 
-
+        [HttpGet]
+        [Route("getUsersPoints")]
+        public async Task<IActionResult> GetUsersPoints(string email)
+        {
+            return Ok(await _mediator.Send(new GetUsersPointsQuery { Email = email }));
+        }
+        [HttpGet]
+        [Route("getUsersPointsHistory")]
+        public async Task<IActionResult> GetUsersPointsHistory(string email)
+        {
+            return Ok(await _mediator.Send(new GetUsersPointsHistoryQuery { Email = email }));
+        }
     }
 }

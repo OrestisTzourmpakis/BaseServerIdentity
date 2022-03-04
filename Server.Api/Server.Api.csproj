@@ -32,4 +32,9 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </EmbeddedResource>
   </ItemGroup>
+    <ItemGroup>
+    <EmbeddedResource Include="Utilities/EmailTemplates/EmailFromWebsiteTemplate.html">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </EmbeddedResource>
+  </ItemGroup>
 </Project>

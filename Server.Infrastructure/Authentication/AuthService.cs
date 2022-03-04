@@ -39,7 +39,7 @@ namespace Server.Infrastructure.Authentication
             var cookies = _httpContextAccessor.HttpContext.Request.Cookies.ToList();
             var user = await _userManager.FindByEmailAsync(request.Email);
             if (user == null)
-                throw new Exception($"User with {request.Email} not found.");
+                throw new Exception($"Incorrect Email or password.");
             if (!user.EmailConfirmed)
                 throw new Exception("Please validate your email first.");
             SignInResult result = default(SignInResult);
@@ -48,7 +48,7 @@ namespace Server.Infrastructure.Authentication
             else
                 result = await _signInManager.PasswordSignInAsync(user.UserName, request.Password, false, lockoutOnFailure: false);
             if (!result.Succeeded)
-                throw new Exception($"Credentials for '{request.Email} aren't valid'.");
+                throw new Exception($"Incorrect Email or password.");
             var roles = await _userManager.GetRolesAsync(user);
             int? companyId = null;
             if (roles.Contains(UserRoles.CompanyOwner.ToString()))

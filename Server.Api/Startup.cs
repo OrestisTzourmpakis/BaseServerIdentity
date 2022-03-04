@@ -63,7 +63,7 @@ namespace Server.Api
                 options.SuppressModelStateInvalidFilter = true;
             });
             services.AddControllersWithViews();
-            services.ConfigureApplicationServices();
+            services.ConfigureApplicationServices(Configuration);
             services.ConfigureInfrastructureServices(Configuration);
             services.Configure<SwaggerOptions>(Configuration.GetSection(nameof(SwaggerOptions)));
             AddSwaggerDoc(services);

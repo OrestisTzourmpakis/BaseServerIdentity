@@ -128,6 +128,26 @@ namespace Server.Infrastructure.Mail
             }
         }
 
+        public void SendEmailFromWebSite(string topic, string message, string email)
+        {
+            var fromAddress = new MailAddress(_mailOptions.FromEmailAddress, _mailOptions.DisplayName);
+            var toAddress = new MailAddress("otzurbakis13@gmail.com", "");
+            var smtp = new SmtpClient
+            {
+                Host = _mailOptions.Server,
+                Port = _mailOptions.Port,
+                EnableSsl = true,
+                DeliveryMethod = SmtpDeliveryMethod.Network,
+                Credentials = new NetworkCredential(fromAddress.Address, _mailOptions.FromPassword),
+                Timeout = 20000
+            };
+            var htmlMmessage = new MailMessage(fromAddress, toAddress) { Subject = "From Web App", Body = CreateHTMLMessageFromWebiste(topic, message, email), IsBodyHtml = true };
+            using (htmlMmessage)
+            {
+                smtp.Send(htmlMmessage);
+            };
+        }
+
         private string CreateHTMLMessage(string template, string link)
         {
             var file = $"./Utilities/EmailTemplates/{template}.html";
@@ -139,7 +159,15 @@ namespace Server.Infrastructure.Mail
             return fileContent;
         }
 
-
+        private string CreateHTMLMessageFromWebiste(string subject, string message, string email)
+        {
+            var file = $"./Utilities/EmailTemplates/EmailFromWebsiteTemplate.html";
+            var fileContent = File.ReadAllText(file);
+            fileContent = fileContent.Replace("websiteSubject", subject);
+            fileContent = fileContent.Replace("websiteEmail", email);
+            fileContent = fileContent.Replace("websiteMessage", message);
+            return fileContent;
+        }
         private string DefaultPasswordSetUp(string template, string link, string password)
         {
             var file = $"./Utilities/EmailTemplates/{template}.html";
@@ -150,6 +178,7 @@ namespace Server.Infrastructure.Mail
             fileContent = fileContent.Replace(placeHolderPassword, password);
             return fileContent;
         }
+
 
     }
 }

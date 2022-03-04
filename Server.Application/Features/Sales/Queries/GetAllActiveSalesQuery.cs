@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Threading;
 using System.Threading.Tasks;
 using AutoMapper;
@@ -10,29 +11,30 @@ using Server.Application.Responses;
 
 namespace Server.Application.Features.Sales.Queries
 {
-    public class GetActiveSalesByCompanyIdQuery : IRequest<BaseResponse>
+    public class GetAllActiveSalesQuery : IRequest<BaseResponse>
     {
-        public int Id { get; set; }
+
     }
 
-    public class GetActiveSalesByCompanyIdQueryHandler : IRequestHandler<GetActiveSalesByCompanyIdQuery, BaseResponse>
+    public class GetAllActiveSalesQueryHandler : IRequestHandler<GetAllActiveSalesQuery, BaseResponse>
     {
-        private readonly IUnitOfWork _unitOfWork;
+        private IUnitOfWork _unitOfWork;
         private IMapper _mapper;
         private readonly IHttpContextAccessorWrapper _httpContextAccessorWrapper;
 
-        public GetActiveSalesByCompanyIdQueryHandler(IUnitOfWork unitOfWork, IMapper mapper, IHttpContextAccessorWrapper httpContextAccessorWrapper)
+        public GetAllActiveSalesQueryHandler(IUnitOfWork unitOfWork, IMapper mapper, IHttpContextAccessorWrapper httpContextAccessorWrapper)
         {
             _unitOfWork = unitOfWork;
             _mapper = mapper;
             _httpContextAccessorWrapper = httpContextAccessorWrapper;
         }
 
-        public async Task<BaseResponse> Handle(GetActiveSalesByCompanyIdQuery request, CancellationToken cancellationToken)
+        public async Task<BaseResponse> Handle(GetAllActiveSalesQuery request, CancellationToken cancellationToken)
         {
-            // i have the company id so go to the sales table!!
-            var activeSales = await _unitOfWork.Sales.GetAsync(c => c.CompanyId == request.Id && c.DateEnd > DateTime.Now, disableTracking: true);
-            var finalSales = activeSales.Select(a =>
+            List<Expression<Func<Server.Domain.Models.Sales, object>>> includeList = new List<Expression<Func<Server.Domain.Models.Sales, object>>>();
+            includeList.Add(c => c.Company);
+            var sales = await _unitOfWork.Sales.GetAsync(c => c.DateEnd > DateTime.Now, includes: includeList);
+            var finalSales = sales.Select(a =>
             {
                 a.Image = a.Image == null ? null : _httpContextAccessorWrapper.GetUrl() + "Images/" + a.Image;
                 return a;

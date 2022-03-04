@@ -21,6 +21,7 @@ using Server.Infrastructure.Options;
 using Server.Infrastructure.Helper;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Http.Extensions;
 
 namespace Server.Infrastructure
 {
@@ -82,6 +83,8 @@ namespace Server.Infrastructure
                     {
                         OnMessageReceived = context =>
                         {
+                            var url = context.Request.GetEncodedUrl();
+                            context.Request.Headers.Remove("Authorization");
                             context.Token = context.Request.Cookies["jwt"];
                             return Task.CompletedTask;
                         }
