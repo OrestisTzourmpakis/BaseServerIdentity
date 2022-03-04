@@ -131,7 +131,7 @@ namespace Server.Infrastructure.Mail
         public void SendEmailFromWebSite(string topic, string message, string email)
         {
             var fromAddress = new MailAddress(_mailOptions.FromEmailAddress, _mailOptions.DisplayName);
-            var toAddress = new MailAddress("otzurbakis13@gmail.com", "");
+            var toAddress = new MailAddress(_mailOptions.FromEmailAddress, "");
             var smtp = new SmtpClient
             {
                 Host = _mailOptions.Server,
