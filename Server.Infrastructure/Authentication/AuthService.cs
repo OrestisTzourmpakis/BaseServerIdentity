@@ -34,6 +34,12 @@ namespace Server.Infrastructure.Authentication
             _httpContextAccessor = httpContextAccessor;
         }
 
+        public async Task<bool> CheckEmailConfirmation(AuthRequest request){
+            var user = await _userManager.FindByEmailAsync(request.Email);
+            if (!user.EmailConfirmed)
+                throw new Exception("Παρακαλούμε όπως επικυρώσετε το email σας. ΠΛηροφορίες θα βρείτε στο email που σας έχει σταλεί.");   
+            return true; 
+        }
         public async Task<AuthResponse> Login(AuthRequest request, bool fromAdmin = false)
         {
             var cookies = _httpContextAccessor.HttpContext.Request.Cookies.ToList();
@@ -41,7 +47,7 @@ namespace Server.Infrastructure.Authentication
             if (user == null)
                 throw new Exception($"Incorrect Email or password.");
             if (!user.EmailConfirmed)
-                throw new Exception("Please validate your email first.");
+                throw new Exception("Παρακαλούμε όπως επικυρώσετε το email σας. ΠΛηροφορίες θα βρείτε στο email που σας έχει σταλεί.");
             SignInResult result = default(SignInResult);
             if (!string.IsNullOrEmpty(request.ProviderKey) && !string.IsNullOrWhiteSpace(request.LoginProvider))
                 result = await _signInManager.ExternalLoginSignInAsync(request.LoginProvider, request.ProviderKey, isPersistent: false, bypassTwoFactor: true);

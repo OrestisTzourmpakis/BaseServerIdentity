@@ -62,7 +62,7 @@ namespace Server.Api.Controllers
 
 
 
-
+      
         [HttpPost]
         [Route("loginAdmin")]
         public async Task<IActionResult> LoginAdmin([FromBody] LoginCommand user)
@@ -198,6 +198,7 @@ namespace Server.Api.Controllers
         [Route("googleLogin")]
         public async Task<IActionResult> GoogleLogin([FromQuery] string viewUrl)
         {
+            // return Ok(await _authService.CheckEmailConfirmation(_mapper.Map<AuthRequest>(user)));
             // get the request headers
             var con = HttpContext;
             var headers = Request.Headers.ToList();
@@ -249,6 +250,10 @@ namespace Server.Api.Controllers
 
                     }
                     // add a login ( i.e insert a row for the user in AspNet )
+                    if(user.EmailConfirmed == false){
+                        user.EmailConfirmed = true;
+                        await _userManager.UpdateAsync(user);
+                    }
                     await _userManager.AddLoginAsync(user, info);
                 }
             }

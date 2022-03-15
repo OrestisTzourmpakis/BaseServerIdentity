@@ -49,6 +49,9 @@ namespace Server.Api.Middleware
                     statusCode = HttpStatusCode.NotFound;
                     break;
                 default:
+                    if(exception.Message == "Sequence contains more than one element.")
+                        result = JsonConvert.SerializeObject(new { errorMessage = "To email χρησιμοποιείται απο άλλον χρήστη" });
+                    else result = JsonConvert.SerializeObject(new { errorMessage = "Κατι πήγε στραβά. Παρακαλώ προσπαθήστε αργότερα." });
                     break;
             }
             context.Response.StatusCode = (int)statusCode;

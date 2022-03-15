@@ -56,6 +56,7 @@ namespace Server.Infrastructure.Repositories
                 throw new ValidationException(new List<ValidationFailure>() { failure });
             }
         }
+
         public async Task<bool> RegisterUser(RegisterCommand user)
         {
             var mappedUser = _mapper.Map<ApplicationUser>(user);

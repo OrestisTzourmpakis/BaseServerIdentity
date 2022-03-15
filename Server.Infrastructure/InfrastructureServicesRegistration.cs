@@ -36,6 +36,7 @@ namespace Server.Infrastructure
                          q.Password.RequiredLength = 8;
                          q.Password.RequiredUniqueChars = 3;
                          q.SignIn.RequireConfirmedEmail = true;
+                         q.User.RequireUniqueEmail = true;
                      }).AddRoles<IdentityRole>().AddEntityFrameworkStores<ServerDbContext>().AddDefaultTokenProviders();
             // builder = new IdentityBuilder(builder.UserType, typeof(IdentityRole), services);
             // builder.AddEntityFrameworkStores<SpatialDbContext>().AddDefaultTokenProviders();

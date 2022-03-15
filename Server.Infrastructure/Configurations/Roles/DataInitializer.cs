@@ -41,15 +41,15 @@ namespace Server.Infrastructure.Configurations.Roles
                 var adminUser = new ApplicationUser
                 {
                     UserName = "admin",
-                    Email = "otzurbakis13@gmail.com"
+                    Email = "dotpointslash@gmail.com"
                 };
-                var companyOwnerUser = new ApplicationUser
-                {
-                    UserName = "companyOwnerTest1",
-                    Email = "o.tzourmpakis@gmail.com"
-                };
-                await SeedUsersHelper(userManager, adminUser, "Orestis123!", nameof(UserRoles.Administrator));
-                await SeedUsersHelper(userManager, companyOwnerUser, "Orestis123!", nameof(UserRoles.CompanyOwner));
+                // var companyOwnerUser = new ApplicationUser
+                // {
+                //     UserName = "companyOwnerTest1",
+                //     Email = "o.tzourmpakis@gmail.com"
+                // };
+                await SeedUsersHelper(userManager, adminUser, "Dennis123!@#", nameof(UserRoles.Administrator));
+                // await SeedUsersHelper(userManager, companyOwnerUser, "Orestis123!", nameof(UserRoles.CompanyOwner));
                 // var checkAdmin = await userManager.FindByEmailAsync(adminUser.Email);
                 // var checkStoreOwner = await userManager.FindByEmailAsync(storeOwnerUser.Email);
                 // if (checkAdmin == null)

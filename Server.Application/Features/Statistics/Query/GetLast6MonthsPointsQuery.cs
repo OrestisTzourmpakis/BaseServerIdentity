@@ -35,9 +35,19 @@ namespace Server.Application.Features.Statistics.Query
             // find the user and then his company!!!
             var dateStart = DateTime.Now.AddMonths(-5);
             var user = await _userManager.FindByEmailAsync(request.CompanyOwnerEmail);
-            var company = await _unitOfWork.Companies.GetByIdAsync(c => c.ApplicationUserId == user.Id);
-            // get the points that this company got!!!
-            var points = await _unitOfWork.PointsHistory.GetAsync(c => (c.TransactionDate >= dateStart && c.TransactionDate <= DateTime.Now) && c.CompanyId == company.Id, disableTracking: true);
+            var adminRole = await _userManager.IsInRoleAsync(user,"Administrator");
+            Company company  = null;
+            IReadOnlyList<PointsHistory> points = null;
+            if(adminRole){
+                // get the points that this company got!!!
+                points = await _unitOfWork.PointsHistory.GetAsync(c => (c.TransactionDate >= dateStart && c.TransactionDate <= DateTime.Now), disableTracking: true);
+            }else{
+                company = await _unitOfWork.Companies.GetByIdAsync(c => c.ApplicationUserId == user.Id);
+                // get the points that this company got!!!
+                points = await _unitOfWork.PointsHistory.GetAsync(c => (c.TransactionDate >= dateStart && c.TransactionDate <= DateTime.Now) 
+                                                                && c.CompanyId == company.Id, disableTracking: true);
+            }
+            
             // i have all the points need to split them between redeem and earned points!!!
             var month1Redeem = points.Where(c => c.TransactionDate.Month == dateStart.Month && c.Transaction < 0).Select(c => c.Transaction).Sum() * -1;
             var month2Redeem = points.Where(c => c.TransactionDate.Month == dateStart.AddMonths(1).Month && c.Transaction < 0).Select(c => c.Transaction).Sum() * -1;
