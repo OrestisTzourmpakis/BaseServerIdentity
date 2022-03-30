@@ -5,8 +5,10 @@
   <ItemGroup>
     <ProjectReference Include="../Server.Application/Server.Application.csproj"/>
   </ItemGroup>
-  <ItemGroup>
-
+  <ItemGroup>&#xD;
+&#xD;
   </ItemGroup>
- 
-</Project> 
+  <ItemGroup>
+    <PackageReference Include="MailKit" Version="3.1.1"/>
+  </ItemGroup>
+</Project>

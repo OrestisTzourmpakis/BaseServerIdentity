@@ -50,7 +50,12 @@ namespace Server.Api.Middleware
                     break;
                 default:
                     if(exception.Message == "Sequence contains more than one element.")
-                        result = JsonConvert.SerializeObject(new { errorMessage = "To email χρησιμοποιείται απο άλλον χρήστη" });
+                        result = JsonConvert.SerializeObject(new { errorMessage = "To email χρησιμοποιείται απο άλλον χρήστη" });                        
+                        else if(exception.Message == "Παρακαλούμε όπως επικυρώσετε το email σας. ΠΛηροφορίες θα βρείτε στο email που σας έχει σταλεί.")
+                        result = JsonConvert.SerializeObject(new { errorMessage = "Παρακαλούμε όπως επικυρώσετε το email σας. Πληροφορίες θα βρείτε στο email που σας έχει σταλεί." });
+                         else if(exception.Message == "Incorrect Email or password.")
+                        result = JsonConvert.SerializeObject(new { errorMessage = "Τα στοιχεία που δώσατε είναι λανθασμένα." });
+                        
                     else result = JsonConvert.SerializeObject(new { errorMessage = "Κατι πήγε στραβά. Παρακαλώ προσπαθήστε αργότερα." });
                     break;
             }

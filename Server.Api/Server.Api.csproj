@@ -12,6 +12,7 @@
     <PackageReference Include="Serilog.Sinks.File" Version="5.0.0"/>
     <PackageReference Include="Swashbuckle.AspNetCore" Version="6.2.3"/>
     <PackageReference Include="Microsoft.AspNetCore.Mvc.NewtonsoftJson" Version="6.0.1"/>
+    <PackageReference Include="MailKit" Version="3.1.1"/>
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="../Server.Application/Server.Application.csproj"/>
@@ -22,7 +23,7 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </EmbeddedResource>
   </ItemGroup>
-   <ItemGroup>
+  <ItemGroup>
     <EmbeddedResource Include="Utilities/EmailTemplates/EmailVerificationTemplateDefaultPassword.html">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </EmbeddedResource>
@@ -32,7 +33,7 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </EmbeddedResource>
   </ItemGroup>
-    <ItemGroup>
+  <ItemGroup>
     <EmbeddedResource Include="Utilities/EmailTemplates/EmailFromWebsiteTemplate.html">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </EmbeddedResource>

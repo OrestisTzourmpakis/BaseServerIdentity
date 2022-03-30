@@ -1,15 +1,17 @@
-using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using System.Net;
-using System.Net.Mail;
-using System.Threading.Tasks;
+// using System.Net.Mail;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Options;
 using Server.Application.Contracts;
-using Server.Infrastructure.Helper;
 using Server.Infrastructure.Options;
+using MailKit;
+using MailKit.Net.Smtp;
+using MimeKit;
+using AutoMapper.Configuration.Annotations;
+using Org.BouncyCastle.X509;
+using System.Security.Cryptography.X509Certificates;
+using System.Net.Security;
 
 namespace Server.Infrastructure.Mail
 {
@@ -36,116 +38,53 @@ namespace Server.Infrastructure.Mail
 
         public void SendEmailAsync(string to, string subject, string content)
         {
-            var fromAddress = new MailAddress(_mailOptions.FromEmailAddress, _mailOptions.DisplayName);
-            var toAddress = new MailAddress(to, "");
-            var smtp = new SmtpClient
-            {
-                Host = _mailOptions.Server,
-                Port = _mailOptions.Port,
-                EnableSsl = true,
-                DeliveryMethod = SmtpDeliveryMethod.Network,
-                Credentials = new NetworkCredential(fromAddress.Address, _mailOptions.FromPassword),
-                Timeout = 20000
-            };
-            var message = new MailMessage(fromAddress, toAddress) { Subject = subject, Body = content };
-            using (message)
-            {
-                smtp.Send(message);
-            };
+            SendEmailDefault(subject, content, to);
         }
 
         public void SendEmailVerificationLink(string to, string subject, string link)
         {
-            var fromAddress = new MailAddress(_mailOptions.FromEmailAddress, _mailOptions.DisplayName);
-            var toAddress = new MailAddress(to, "");
-            var smtp = new SmtpClient
-            {
-                Host = _mailOptions.Server,
-                Port = _mailOptions.Port,
-                EnableSsl = true,
-                DeliveryMethod = SmtpDeliveryMethod.Network,
-                Credentials = new NetworkCredential(fromAddress.Address, _mailOptions.FromPassword),
-                Timeout = 20000
-            };
-            using (var message = new MailMessage(fromAddress, toAddress)
-            {
-                Subject = subject,
-                Body = CreateHTMLMessage("EmailVerificationTemplate", link),
-                IsBodyHtml = true
-            })
-            {
-                smtp.Send(message);
-            }
+            var bodyTemp = CreateHTMLMessage("EmailVerificationTemplate", link);
+            SendEmailDefault(subject, bodyTemp, to);
         }
 
         public void SendEmailFromAdminVerificationLink(string to, string subject, string link, string password)
         {
-            var fromAddress = new MailAddress(_mailOptions.FromEmailAddress, _mailOptions.DisplayName);
-            var toAddress = new MailAddress(to, "");
-            var smtp = new SmtpClient
-            {
-                Host = _mailOptions.Server,
-                Port = _mailOptions.Port,
-                EnableSsl = true,
-                DeliveryMethod = SmtpDeliveryMethod.Network,
-                Credentials = new NetworkCredential(fromAddress.Address, _mailOptions.FromPassword),
-                Timeout = 20000
-            };
-            //var templateLink = CreateHTMLMessage("EmailVerificationTemplate", link);
-            var templatePassword = DefaultPasswordSetUp("EmailVerificationTemplateDefaultPassword", link, password);
-            using (var message = new MailMessage(fromAddress, toAddress)
-            {
-                Subject = subject,
-                Body = templatePassword,
-                IsBodyHtml = true
-            })
-            {
-                smtp.Send(message);
-            }
+            var templatePassword = DefaultPasswordSetUp("EmailVerificationTemplateDefaultPassword", link, password,to);
+            SendEmailDefault(subject, templatePassword, to);
         }
 
         public void SendEmaiForgotPassowrdLink(string to, string subject, string link)
         {
-            var fromAddress = new MailAddress(_mailOptions.FromEmailAddress, _mailOptions.DisplayName);
-            var toAddress = new MailAddress(to, "");
-            var smtp = new SmtpClient
-            {
-                Host = _mailOptions.Server,
-                Port = _mailOptions.Port,
-                EnableSsl = true,
-                DeliveryMethod = SmtpDeliveryMethod.Network,
-                Credentials = new NetworkCredential(fromAddress.Address, _mailOptions.FromPassword),
-                Timeout = 20000
-            };
-            using (var message = new MailMessage(fromAddress, toAddress)
-            {
-                Subject = subject,
-                Body = CreateHTMLMessage("ResetPasswordTemplate", link),
-                IsBodyHtml = true
-            })
-            {
-                smtp.Send(message);
-            }
+            var bodyTemp = CreateHTMLMessage("ResetPasswordTemplate", link);
+            SendEmailDefault(subject, bodyTemp, to);
         }
 
         public void SendEmailFromWebSite(string topic, string message, string email)
         {
-            var fromAddress = new MailAddress(_mailOptions.FromEmailAddress, _mailOptions.DisplayName);
-            var toAddress = new MailAddress(_mailOptions.FromEmailAddress, "");
-            var smtp = new SmtpClient
+            var bodyTemp = CreateHTMLMessageFromWebiste(topic, message, email);
+            SendEmailDefault("Email from the application user form", bodyTemp, "");
+        }
+
+        private void SendEmailDefault(string subject, string body, string toEmailAddress)
+        {
+            var toEmailAddressTemp = (toEmailAddress == "") ? _mailOptions.FromEmailAddress : toEmailAddress;
+            var mailMessage = new MimeMessage();
+            mailMessage.From.Add(new MailboxAddress(_mailOptions.DisplayName, _mailOptions.FromEmailAddress));
+            mailMessage.To.Add(MailboxAddress.Parse(toEmailAddressTemp));
+            mailMessage.Subject = subject;
+            var bodyTemp = new BodyBuilder()
             {
-                Host = _mailOptions.Server,
-                Port = _mailOptions.Port,
-                EnableSsl = true,
-                DeliveryMethod = SmtpDeliveryMethod.Network,
-                Credentials = new NetworkCredential(fromAddress.Address, _mailOptions.FromPassword),
-                Timeout = 20000
+                HtmlBody = body
             };
-            var htmlMmessage = new MailMessage(fromAddress, toAddress) { Subject = "From Web App", Body = CreateHTMLMessageFromWebiste(topic, message, email), IsBodyHtml = true };
-            using (htmlMmessage)
+            mailMessage.Body = bodyTemp.ToMessageBody();
+            using (var smtpClient = new SmtpClient())
             {
-                smtp.Send(htmlMmessage);
-            };
+                smtpClient.ServerCertificateValidationCallback = (object sender, System.Security.Cryptography.X509Certificates.X509Certificate certificate, X509Chain chain, SslPolicyErrors sslPolicyErrors) => { return true; };
+                smtpClient.Connect(_mailOptions.Server, _mailOptions.Port, true);
+                smtpClient.Authenticate(_mailOptions.FromEmailAddress, _mailOptions.FromPassword);
+                smtpClient.Send(mailMessage);
+                smtpClient.Disconnect(true);
+            }
         }
 
         private string CreateHTMLMessage(string template, string link)
@@ -168,7 +107,7 @@ namespace Server.Infrastructure.Mail
             fileContent = fileContent.Replace("websiteMessage", message);
             return fileContent;
         }
-        private string DefaultPasswordSetUp(string template, string link, string password)
+        private string DefaultPasswordSetUp(string template, string link, string password,string email)
         {
             var file = $"./Utilities/EmailTemplates/{template}.html";
             var fileContent = File.ReadAllText(file);
@@ -176,6 +115,8 @@ namespace Server.Infrastructure.Mail
             fileContent = fileContent.Replace(placeHolder, link);
             string placeHolderPassword = "defaultPassword";
             fileContent = fileContent.Replace(placeHolderPassword, password);
+            string placeHolderEmail = "useremail";
+            fileContent = fileContent.Replace(placeHolderEmail, email);
             return fileContent;
         }
 

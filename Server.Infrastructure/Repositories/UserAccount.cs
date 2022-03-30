@@ -164,7 +164,7 @@ namespace Server.Infrastructure.Repositories
                 }
             };
             var confirmationLink = _httpContextAccessorWrapper.ConstructUrl("api/useraccount/verifyemail", dict);
-            _emailSender.SendEmailFromAdminVerificationLink(mappedUser.Email, "Email verification", confirmationLink, user.Password);
+            _emailSender.SendEmailFromAdminVerificationLink(mappedUser.Email, "ΚΩΔΙΚΟΙ ΕΓΓΡΑΦΗΣ ΚΑΤΑΣΤΗΜΑΤΟΣ ΣΕ ΠΛΑΤΦΟΡΜΑ ΕΠΙΒΡΑΒΕΥΣΗΣ ΠΕΛΑΤΩΝ (LOYALTY)", confirmationLink, user.Password);
             return true;
         }
 

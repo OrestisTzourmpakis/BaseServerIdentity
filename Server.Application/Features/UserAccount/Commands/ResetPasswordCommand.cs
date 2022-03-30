@@ -61,6 +61,9 @@ namespace Server.Application.Features.UserAccount.Commands
                 {
 
                     return htmlView.GetViewResult<ResetPasswordModel>(HtmlTemplates.ResetPassSucceedView, model);
+                }else{
+                    request.ModelIsValid = false;
+                    return htmlView.GetViewResult<ResetPasswordModel>(HtmlTemplates.ResetPasswordForm, model);
                 }
 
             }
