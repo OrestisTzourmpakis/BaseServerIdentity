@@ -12,6 +12,7 @@ using Microsoft.OpenApi.Models;
 using Server.Api.Middleware;
 using Server.Api.Models;
 using Server.Application;
+using Server.Application.Options;
 using Server.Infrastructure;
 using Server.Infrastructure.Configurations.Roles;
 using System;
@@ -65,6 +66,7 @@ namespace Server.Api
             services.AddControllersWithViews();
             services.ConfigureApplicationServices(Configuration);
             services.ConfigureInfrastructureServices(Configuration);
+            services.Configure<DomainsOptions>(Configuration.GetSection(nameof(DomainsOptions)));
             services.Configure<SwaggerOptions>(Configuration.GetSection(nameof(SwaggerOptions)));
             AddSwaggerDoc(services);
         }

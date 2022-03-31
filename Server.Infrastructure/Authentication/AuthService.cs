@@ -11,6 +11,7 @@ using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using Server.Application.Contracts;
 using Server.Application.Models.Identity;
+using Server.Application.Options;
 using Server.Application.Utilities;
 using Server.Domain.Models;
 using Server.Infrastructure.Persistence;
@@ -25,20 +26,23 @@ namespace Server.Infrastructure.Authentication
         private readonly IUnitOfWork _unitOfWork;
 
         private readonly IHttpContextAccessor _httpContextAccessor;
-        public AuthService(UserManager<ApplicationUser> userManager, SignInManager<ApplicationUser> signInManager, IUnitOfWork unitOfWork, IOptions<JwtSettings> jwtSettings, IHttpContextAccessor httpContextAccessor)
+        private readonly DomainsOptions _domainOptions;
+        public AuthService(UserManager<ApplicationUser> userManager, SignInManager<ApplicationUser> signInManager, IUnitOfWork unitOfWork, IOptions<JwtSettings> jwtSettings, IHttpContextAccessor httpContextAccessor, IOptionsSnapshot<DomainsOptions> domainsOptions)
         {
             _userManager = userManager;
             _signInManager = signInManager;
             _jwtSettings = jwtSettings.Value;
             _unitOfWork = unitOfWork;
             _httpContextAccessor = httpContextAccessor;
+            _domainOptions = domainsOptions.Value;
         }
 
-        public async Task<bool> CheckEmailConfirmation(AuthRequest request){
+        public async Task<bool> CheckEmailConfirmation(AuthRequest request)
+        {
             var user = await _userManager.FindByEmailAsync(request.Email);
             if (!user.EmailConfirmed)
-                throw new Exception("Παρακαλούμε όπως επικυρώσετε το email σας. ΠΛηροφορίες θα βρείτε στο email που σας έχει σταλεί.");   
-            return true; 
+                throw new Exception("Παρακαλούμε όπως επικυρώσετε το email σας. ΠΛηροφορίες θα βρείτε στο email που σας έχει σταλεί.");
+            return true;
         }
         public async Task<AuthResponse> Login(AuthRequest request, bool fromAdmin = false)
         {
@@ -84,7 +88,9 @@ namespace Server.Infrastructure.Authentication
                     {
                         HttpOnly = true,
                         SameSite = SameSiteMode.None,
-                        Secure = true
+                        Secure = true,
+                        Domain = _domainOptions.AdminDomain
+
                     });
                 }
             }
@@ -97,7 +103,8 @@ namespace Server.Infrastructure.Authentication
                     {
                         HttpOnly = true,
                         SameSite = SameSiteMode.None,
-                        Secure = true
+                        Secure = true,
+                        Domain = _domainOptions.WebDomain
                     });
                 }
 
