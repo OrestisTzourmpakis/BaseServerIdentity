@@ -24,7 +24,15 @@ namespace Server.Application
                 {
                     options.ClientId = configuration["GoogleApi:ClientId"];
                     options.ClientSecret = configuration["GoogleApi:ClientSecret"];
-                });
+                })
+                .AddFacebook(
+                    options =>
+                    {
+                        options.ClientId = configuration["FacebookApi:ClientId"];
+                        options.ClientSecret = configuration["FacebookApi:ClientSecret"];
+                    }
+                )
+                ;
             return services;
         }
     }

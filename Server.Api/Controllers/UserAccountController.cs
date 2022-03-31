@@ -62,7 +62,7 @@ namespace Server.Api.Controllers
 
 
 
-      
+
         [HttpPost]
         [Route("loginAdmin")]
         public async Task<IActionResult> LoginAdmin([FromBody] LoginCommand user)
@@ -179,6 +179,7 @@ namespace Server.Api.Controllers
             };
             return await _mediator.Send(model);
         }
+
         [AllowAnonymous]
         [HttpPost]
         [Route("signin-google")]
@@ -195,15 +196,19 @@ namespace Server.Api.Controllers
 
         [AllowAnonymous]
         [HttpGet]
-        [Route("googleLogin")]
-        public async Task<IActionResult> GoogleLogin([FromQuery] string viewUrl)
+        [Route("externalLoginRequest")]
+        public async Task<IActionResult> GoogleLogin([FromQuery] string viewUrl, [FromQuery] string provider)
         {
             // return Ok(await _authService.CheckEmailConfirmation(_mapper.Map<AuthRequest>(user)));
             // get the request headers
             var con = HttpContext;
             var headers = Request.Headers.ToList();
             // Response.Headers.AccessControlAllowOrigin = "*";
-            return await _mediator.Send(new GoogleLoginCommand { ViewUrl = viewUrl });
+            ProviderNames providerFinal;
+            bool checkParsed = Enum.TryParse(provider, out providerFinal);
+            if (!checkParsed)
+                throw new Exception();
+            return await _mediator.Send(new ExternalLoginCommand { ViewUrl = viewUrl, Provider = providerFinal });
         }
 
         [AllowAnonymous]
@@ -250,7 +255,8 @@ namespace Server.Api.Controllers
 
                     }
                     // add a login ( i.e insert a row for the user in AspNet )
-                    if(user.EmailConfirmed == false){
+                    if (user.EmailConfirmed == false)
+                    {
                         user.EmailConfirmed = true;
                         await _userManager.UpdateAsync(user);
                     }

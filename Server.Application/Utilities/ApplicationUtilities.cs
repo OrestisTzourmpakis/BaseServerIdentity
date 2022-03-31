@@ -11,4 +11,10 @@ namespace Server.Application.Utilities
         CompanyOwner
     }
 
+    public enum ProviderNames
+    {
+        Google,
+        Facebook
+    }
+
 }
