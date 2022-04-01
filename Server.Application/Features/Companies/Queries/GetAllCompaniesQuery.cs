@@ -34,7 +34,7 @@ namespace Server.Application.Features.Companies.Queries
 
         public async Task<BaseResponse> Handle(GetAllCompaniesQuery request, CancellationToken cancellationToken)
         {
-            var includeList = new List<Expression<Func<Company, object>>>() { c => c.Owner };
+            var includeList = new List<Expression<Func<Company, object>>>() { c => c.Owner, c => c.Category };
             // get all companies
             var companies = await _unitOfWork.Companies.GetAsync(includes: includeList);
             var mappedCompanies = _mapper.Map<List<GetAllCompaniesModel>>(companies);

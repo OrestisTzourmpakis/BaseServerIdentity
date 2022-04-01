@@ -34,6 +34,7 @@ namespace Server.Infrastructure.Repositories
                 Website = a.Website,
                 Twitter = a.Twitter,
                 Facebook = a.Facebook,
+                CategoryId = a.CategoryId,
                 Instagram = a.Instagram,
                 EuroToPointsRatio = a.EuroToPointsRatio,
                 PointsToEuroRatio = a.PointsToEuroRatio,

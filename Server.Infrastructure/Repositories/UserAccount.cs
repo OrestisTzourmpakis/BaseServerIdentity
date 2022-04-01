@@ -196,6 +196,9 @@ namespace Server.Infrastructure.Repositories
                 HttpOnly = true,
                 SameSite = SameSiteMode.None,
                 Secure = true
+#if !DEBUG
+                Domain  = ".loyaltylevadeon.gr"
+#endif
             });
 
             return Task.CompletedTask;

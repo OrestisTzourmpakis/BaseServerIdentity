@@ -22,6 +22,8 @@ namespace Server.Infrastructure.Repositories
         public IGenericRepository<ApplicationUserCompany> UserCompanies => _userCompanies ??= new GenericRepository<ApplicationUserCompany>(_context);
         public IGenericRepository<Sales> Sales => _sales ??= new GenericRepository<Sales>(_context);
 
+        public IGenericRepository<Categories> Categories => _categories ??= new GenericRepository<Categories>(_context);
+        private IGenericRepository<Categories> _categories;
         private PointsRepository _points;
         private ICompanyRepository _companies;
         private IGenericRepository<Store> _stores;

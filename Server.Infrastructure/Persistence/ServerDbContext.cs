@@ -34,7 +34,7 @@ namespace Server.Infrastructure.Persistence
             builder.Entity<Points>().HasKey(p => new { p.ApplicationUserId, p.CompanyId });
             builder.Entity<Company>().Property(b => b.PointsToEuroRatio).HasDefaultValue(0.001);
             builder.Entity<Company>().Property(b => b.EuroToPointsRatio).HasDefaultValue(0.2);
-
+            builder.Entity<Company>().HasOne(p => p.Category).WithMany(p => p.Companies).HasForeignKey(l => l.CategoryId).OnDelete(DeleteBehavior.SetNull);
             // builder.Entity<Store>().HasKey(p => new { p.Id, p.CompanyId, p.Address });
             base.OnModelCreating(builder);
         }

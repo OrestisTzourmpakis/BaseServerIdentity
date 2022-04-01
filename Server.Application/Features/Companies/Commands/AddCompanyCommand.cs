@@ -29,6 +29,7 @@ namespace Server.Application.Features.Companies.Commands
         public string Email { get; set; }
         public double EuroToPointsRatio { get; set; }
         public double PointsToEuroRatio { get; set; }
+        public int? CategoryId { get; set; }
         public IFormFile LogoFile { get; set; }
     }
 

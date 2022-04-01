@@ -19,9 +19,12 @@ namespace Server.Domain.Models
         public double PointsToEuroRatio { get; set; }
         public double EuroToPointsRatio { get; set; }
         public string ApplicationUserId { get; set; }
+        public int? CategoryId { get; set; }
+        public Categories Category { get; set; }
         public ICollection<Store> Stores { get; set; }
         public ICollection<Sales> Sales { get; set; }
         public ICollection<Points> Points { get; set; }
+
 
         public ApplicationUser Owner { get; set; }
     }

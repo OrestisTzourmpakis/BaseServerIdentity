@@ -89,7 +89,9 @@ namespace Server.Infrastructure.Authentication
                         HttpOnly = true,
                         SameSite = SameSiteMode.None,
                         Secure = true,
+#if !DEBUG
                         Domain = _domainOptions.AdminDomain
+#endif
 
                     });
                 }
@@ -104,7 +106,9 @@ namespace Server.Infrastructure.Authentication
                         HttpOnly = true,
                         SameSite = SameSiteMode.None,
                         Secure = true,
+#if !DEBUG
                         Domain = _domainOptions.WebDomain
+#endif
                     });
                 }
 

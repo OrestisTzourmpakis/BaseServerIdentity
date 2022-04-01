@@ -30,6 +30,7 @@ namespace Server.Application.Features.Companies.Commands
         public double EuroToPointsRatio { get; set; }
         public double PointsToEuroRatio { get; set; }
         public string ApplicationUserId { get; set; }
+        public int? CategoryId { get; set; }
         public IFormFile LogoFile { get; set; }
     }
     public class UpdateCompanyCommandHandler : IRequestHandler<UpdateCompanyCommand, BaseResponse>

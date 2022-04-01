@@ -16,6 +16,8 @@ namespace Server.Application.Contracts
         IGenericRepository<ApplicationUser> Users { get; }
         IGenericRepository<PointsHistory> PointsHistory { get; }
         IGenericRepository<Sales> Sales { get; }
+        IGenericRepository<Categories> Categories { get; }
+
 
 
 

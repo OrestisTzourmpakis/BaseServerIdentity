@@ -18,6 +18,8 @@ namespace Server.Application.Models.CompanyModel
         public string Facebook { get; set; }
         public double PointsToEuroRatio { get; set; }
         public double EuroToPointsRatio { get; set; }
+        public int? CategoryId { get; set; }
+        public string Category { get; set; }
         public string OwnerEmail { get; set; }
     }
 }

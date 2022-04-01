@@ -6,6 +6,7 @@ using AutoMapper;
 using Microsoft.AspNetCore.Identity;
 using Server.Application.DTO.Login;
 using Server.Application.DTO.Register;
+using Server.Application.Features.Categories.Commands;
 using Server.Application.Features.Companies.Commands;
 using Server.Application.Features.Sales.Commands;
 using Server.Application.Features.Stores.Commands;
@@ -43,6 +44,7 @@ namespace Server.Application.Profiles
                 .ForPath(dest => dest.Owner.Email,
                 a => a.MapFrom(src => src.OwnerEmail)
                 )
+                .ForPath(dest => dest.Category.Name, a => a.MapFrom(src => src.Category))
                 .ReverseMap();
             CreateMap<Company, CompaniesWithCountResponse>().ReverseMap();
             #endregion Companies
@@ -65,6 +67,10 @@ namespace Server.Application.Profiles
                 .ForMember(dest => dest.UserJoined, opt => opt.MapFrom(src => src.DateJoined)).ReverseMap();
 
             #endregion Points
+            #region Categories
+            CreateMap<Categories, AddCategoryCommand>().ReverseMap();
+            CreateMap<Categories, UpdateCategoryCommand>().ReverseMap();
+            #endregion
         }
     }
 }
