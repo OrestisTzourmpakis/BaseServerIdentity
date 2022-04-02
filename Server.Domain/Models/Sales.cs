@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -11,6 +12,8 @@ namespace Server.Domain.Models
         public string Title { get; set; }
         public string Description { get; set; }
         public string Image { get; set; }
+        [NotMapped]
+        public string Category { get; set; }
         public DateTime DateStart { get; set; }
         public DateTime DateEnd { get; set; }
         public int CompanyId { get; set; }
